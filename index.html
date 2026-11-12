@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agência Lupa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Mesa de detetive à noite: fundo azul-tinta, documentos em papel frio,
+     carimbo vermelho para decisões, etiqueta amarela para provas. Uma coluna, feita para celular. */
+  color-scheme: dark;
+  --ink:#0f1629;
+  --ink-2:#18213b;
+  --ink-3:#222e52;
+  --line:#33416d;
+  --text:#e8ecf7;
+  --muted:#9ba7c9;
+  --paper:#e9ece3;
+  --paper-2:#d5dacb;
+  --paper-ink:#1c2135;
+  --stamp:#e5483d;
+  --marker:#f3c62f;
+  --ok:#59c98b;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-hand:"Kalam","Comic Sans MS",cursive;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--marker);outline-offset:2px}
+svg{max-width:100%;display:block}
+h1,h2,h3{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.02em;line-height:1;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px 64px}
+
+/* ---------- capa ---------- */
+.hero{padding:28px 0 20px;border-bottom:2px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.hero .eyebrow{font-family:var(--f-mono);font-size:12px;color:var(--marker);letter-spacing:.14em;text-transform:uppercase}
+.hero h1{font-size:clamp(54px,17vw,96px);font-weight:900;letter-spacing:-.01em}
+.hero h1 span{color:var(--stamp)}
+.hero p{color:var(--muted);max-width:56ch}
+.rules{display:flex;flex-direction:column;gap:6px;margin:18px 0 6px;padding:0;list-style:none;font-size:14.5px;color:var(--text)}
+.rules li{padding-left:18px;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:.62em;width:9px;height:2px;background:var(--marker)}
+.files{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.file{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:stretch;text-align:left;background:var(--paper);color:var(--paper-ink);border:0;border-radius:3px;padding:0;position:relative;overflow:hidden;width:100%}
+.file .num{background:var(--marker);font-family:var(--f-display);font-weight:900;font-size:44px;display:flex;align-items:center;justify-content:center;padding:0 12px;min-width:76px;color:#1c1a10}
+.file .body{padding:14px 14px 14px 0;display:flex;flex-direction:column;gap:6px}
+.file h2{font-size:28px;font-weight:900}
+.file .meta{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#4d566f;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
+.file p{font-size:14.5px;line-height:1.45}
+.pips{display:inline-flex;gap:3px;vertical-align:middle}
+.pips i{width:10px;height:10px;border:1.5px solid var(--paper-ink);border-radius:50%;display:block}
+.pips i.on{background:var(--stamp);border-color:var(--stamp)}
+.file .status{font-family:var(--f-display);font-weight:900;font-size:15px;letter-spacing:.08em;color:var(--stamp);border:2px solid var(--stamp);padding:2px 7px;border-radius:2px;transform:rotate(-4deg);position:absolute;right:10px;top:10px;background:rgba(233,236,227,.85)}
+.foot{margin-top:28px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.linkbtn{background:none;border:0;padding:6px 0;color:var(--muted);text-decoration:underline;font-size:13px}
+
+/* ---------- caso ---------- */
+.top{position:sticky;top:0;z-index:5;background:var(--ink);border-bottom:1px solid var(--line);margin:0 -16px;padding:0 16px}
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 0 8px}
+.back{background:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:6px 10px;font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+.topbar h1{font-size:22px;font-weight:900;flex:1;min-width:0}
+.topbar .tag{font-family:var(--f-mono);font-size:11px;color:var(--marker);white-space:nowrap}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 1 0;min-width:0;background:none;border:0;border-bottom:3px solid transparent;padding:9px 2px 8px;font-family:var(--f-display);font-weight:700;font-size:clamp(11.5px,3.3vw,16px);letter-spacing:0;overflow:hidden;text-transform:uppercase;color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--stamp)}
+.tab.accuse[aria-selected="true"]{color:var(--stamp)}
+.panel{padding-top:20px;display:flex;flex-direction:column;gap:18px}
+.lead{font-size:17px}
+.story{display:flex;flex-direction:column;gap:12px;max-width:62ch}
+.kicker{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--marker)}
+.box{background:var(--ink-2);border:1px solid var(--line);border-radius:4px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.box h3{font-size:18px;font-weight:700;letter-spacing:.06em}
+.facts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.facts li{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.facts b{font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--marker);white-space:nowrap;padding-top:2px}
+
+/* suspeitos */
+.sus{background:var(--paper);color:var(--paper-ink);border-radius:3px;overflow:hidden;position:relative}
+.sus .head{display:grid;grid-template-columns:104px 1fr;gap:12px;padding:12px 12px 0}
+.sus .pic{border:2px solid var(--paper-ink);background:#c5cede}
+.sus h3{font-size:25px;font-weight:900}
+.sus .role{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:#4d566f;margin-top:4px}
+.sus dl{margin:8px 0 0;font-size:14px;line-height:1.4;display:flex;flex-direction:column;gap:6px}
+.sus dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6a718a}
+.sus dd{margin:0}
+.sus blockquote{margin:12px;padding:10px 12px;background:#fff;border-left:4px solid var(--paper-ink);font-size:15px;line-height:1.5}
+.sus blockquote::before{content:"Depoimento";display:block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6a718a;margin-bottom:4px}
+.sus .act{padding:0 12px 12px;display:flex;justify-content:flex-end}
+.chip{background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:500}
+.sus.off .head,.sus.off blockquote{opacity:.42}
+.sus .head{padding-bottom:12px}
+.mail{background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:15px}
+.mail header{display:flex;flex-direction:column;gap:2px;border-bottom:1.5px solid var(--paper-ink);padding-bottom:10px}
+.mail header b{font-size:17px;line-height:1.25}
+.mail header span{font-family:var(--f-mono);font-size:11.5px;color:#4d566f}
+.mail .att{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-top:1px solid #b6bfd0;padding-top:10px}
+.mail .att span{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#4d566f;width:100%}
+.mail .att i{font-style:normal;font-size:12.5px;background:#fff;border:1px solid #b6bfd0;border-radius:3px;padding:2px 7px}
+.mail .btn.ghost{border-color:var(--paper-ink);color:var(--paper-ink);align-self:flex-start}
+.msg.del{font-style:italic;color:#8fa0cc}
+.sus.off::after{content:"DESCARTADO";position:absolute;left:50%;top:74px;transform:translateX(-50%) rotate(-8deg);font-family:var(--f-display);font-weight:900;font-size:34px;letter-spacing:.08em;color:var(--stamp);border:3px solid var(--stamp);padding:0 10px;border-radius:3px;pointer-events:none;background:rgba(233,236,227,.7)}
+.wit{background:var(--ink-2);border:1px solid var(--line);border-radius:4px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.wit b{font-family:var(--f-display);font-size:19px;letter-spacing:.04em;text-transform:uppercase}
+.wit small{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.wit p{font-size:15px;margin-top:4px}
+
+/* pistas */
+.clue{background:var(--ink-2);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.clue .bar{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.evtag{background:var(--marker);color:#1c1a10;font-family:var(--f-display);font-weight:900;font-size:17px;padding:1px 8px;border-radius:2px;white-space:nowrap}
+.clue h3{font-size:19px;font-weight:700;letter-spacing:.04em;flex:1}
+.zoom{background:var(--ink-3);border:1px solid var(--line);border-radius:3px;padding:4px 9px;font-family:var(--f-mono);font-size:11.5px;white-space:nowrap}
+.clue .art{background:#0a0f1d;padding:10px;cursor:zoom-in}
+.clue .cap{padding:10px 12px 12px;font-size:14px;color:var(--muted)}
+.art svg{width:100%;height:auto;border-radius:2px}
+.t-mono{font-family:var(--f-mono)}
+.t-hand{font-family:var(--f-hand)}
+.t-disp{font-family:var(--f-display);font-weight:900}
+.doc{border-radius:3px;padding:14px;font-size:13.5px;line-height:1.5;overflow-x:auto}
+.doc.hand{background:var(--paper);color:#1d2a52;font-family:var(--f-hand);font-size:16px;line-height:1.55}
+.doc.hand h4{margin:0 0 6px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#4d566f;border-bottom:1.5px solid #4d566f;padding-bottom:5px}
+.doc.hand table{border-collapse:collapse;width:100%}
+.doc.hand td{padding:1px 8px 1px 0;border-bottom:1px solid #b6bfd0;vertical-align:top}
+.doc.hand td:first-child{white-space:nowrap;font-weight:700}
+.doc.hand table.wrap td:first-child{white-space:normal;width:38%}
+.doc.hand .obs{margin-top:8px;font-size:15px}
+.doc.term{background:#060a14;color:#bcd0f5;font-family:var(--f-mono);font-size:12px;border:1px solid #26335c}
+.doc.term h4{margin:0 0 8px;font-size:11.5px;font-weight:600;color:var(--marker);letter-spacing:.06em}
+.doc.term table{border-collapse:collapse;width:100%}
+.doc.term td{padding:2px 8px 2px 0;vertical-align:top;font-variant-numeric:tabular-nums}
+.doc.term td:first-child{color:#7f90bd;white-space:nowrap}
+.doc.term .hl{color:#fff}
+.doc.receipt{background:#fbfbf6;color:#23252b;font-family:var(--f-mono);font-size:12.5px;max-width:290px;margin:0 auto;border-radius:0;border-top:1px dashed #aaa;border-bottom:1px dashed #aaa}
+.doc.receipt h4{margin:0 0 6px;text-align:center;font-size:14px;letter-spacing:.08em}
+.doc.receipt .c{text-align:center}
+.doc.receipt hr{border:0;border-top:1px dashed #888;margin:8px 0}
+.doc.receipt table{width:100%;border-collapse:collapse}
+.doc.receipt td{padding:1px 6px 1px 0;vertical-align:top}
+.doc.receipt td:first-child{white-space:nowrap}
+.doc.chat{background:#101a2c;font-family:var(--f-body);display:flex;flex-direction:column;gap:8px}
+.doc.chat h4{margin:0;font-size:13px;font-weight:600;color:#cfd8ef;border-bottom:1px solid #2a385e;padding-bottom:8px}
+.msg{background:#1d2a48;border-radius:10px 10px 10px 2px;padding:8px 10px;max-width:88%;font-size:14px}
+.msg small{display:block;font-size:11px;color:#8fa0cc}
+.msg .who{display:block;font-size:12px;font-weight:600;color:var(--marker)}
+.msg .thumb{background:#2c3a60;border-radius:6px;padding:16px 10px;text-align:center;font-size:12px;color:#aab7dc;margin:6px 0}
+.cipher{font-family:var(--f-mono);font-weight:600;font-size:17px;letter-spacing:.12em;color:#1c2135;line-height:1.9;word-spacing:.3em}
+.scrib{float:right;border:1.5px solid #1d2a52;border-radius:50%;padding:2px 10px;transform:rotate(6deg);font-size:17px;margin-left:10px}
+
+/* notas */
+textarea{width:100%;min-height:260px;background:var(--paper);color:#1d2a52;border:0;border-radius:3px;padding:14px;font-family:var(--f-hand);font-size:17px;line-height:1.6;resize:vertical}
+
+/* acusação */
+fieldset{border:1px solid var(--line);border-radius:4px;margin:0;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--ink-2);min-width:0}
+legend{font-family:var(--f-display);font-weight:700;font-size:19px;letter-spacing:.04em;text-transform:uppercase;padding:0 6px}
+.opt{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px;border:1px solid var(--line);border-radius:3px;background:var(--ink);font-size:15px;cursor:pointer}
+.opt input{margin:3px 0 0;width:18px;height:18px;accent-color:var(--stamp)}
+.opt:has(input:checked){border-color:var(--stamp);background:#2a1b2a}
+.btn{background:var(--stamp);color:#fff;border:0;border-radius:3px;padding:13px 18px;font-family:var(--f-display);font-weight:900;font-size:21px;letter-spacing:.08em;text-transform:uppercase}
+.btn.ghost{background:none;border:1.5px solid var(--line);color:var(--text);font-size:16px;padding:10px 14px;font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.verdict{border:2px solid var(--stamp);border-radius:4px;padding:12px 14px;color:#ffd6d2;background:#2a1620;font-size:15px}
+.hint{background:#2b2710;border:1px solid #6d5d18;color:#f6e9b4;border-radius:4px;padding:10px 12px;font-size:15px}
+.hint b{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:block;color:var(--marker)}
+.solved{background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:18px 16px;display:flex;flex-direction:column;gap:14px;position:relative}
+.solved .stamp{align-self:flex-start;font-family:var(--f-display);font-weight:900;font-size:36px;letter-spacing:.08em;color:var(--stamp);border:4px solid var(--stamp);padding:0 12px;border-radius:3px;transform:rotate(-3deg)}
+.solved .stamp.help{color:#4d566f;border-color:#4d566f}
+.solved h3{font-size:24px;font-weight:900}
+.solved ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;font-size:15.5px}
+.solved .rank{font-family:var(--f-mono);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:#4d566f}
+.solved .rank b{color:var(--paper-ink);font-size:14px}
+.solved .epi{font-size:15.5px;border-top:1.5px solid var(--paper-ink);padding-top:12px}
+.solved .btn.ghost{border-color:var(--paper-ink);color:var(--paper-ink)}
+@media (prefers-reduced-motion:no-preference){
+  .solved .stamp{animation:thud .35s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes thud{from{transform:rotate(-3deg) scale(1.9);opacity:.2}to{transform:rotate(-3deg) scale(1);opacity:1}}
+}
+
+/* ampliação */
+#modal{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.96);display:flex;flex-direction:column}
+#modal[hidden]{display:none}
+#modal .mbar{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+#modal .mbar h3{flex:1;font-size:18px;font-weight:700;letter-spacing:.04em;min-width:0}
+#modal .mbody{flex:1;overflow:auto;padding:14px;-webkit-overflow-scrolling:touch}
+#modal .inner{width:100%;margin:0 auto;max-width:900px}
+#modal .inner.x2{width:210%;max-width:none}
+#modal .inner .doc{font-size:15.5px}
+#modal .inner.x2 .doc{font-size:22px}
+#modal .inner .doc.receipt{max-width:none}
+#modal .mcap{padding:10px 14px 14px;font-size:14px;color:var(--muted);border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mtitle">
+  <div class="mbar"><h3 id="mtitle"></h3><button class="zoom" id="mzoom" type="button">Ampliar</button><button class="zoom" id="mclose" type="button">Fechar</button></div>
+  <div class="mbody"><div class="inner" id="minner"></div></div>
+  <div class="mcap" id="mcap"></div>
+</div>
+<script>
+/* =========================================================
+   DESENHOS
+   ========================================================= */
+function portrait(p){
+  const sk=p.skin, hr=p.hair, cl=p.cloth, bg=p.bg||'#c5cede';
+  const capPath='M35 60 Q31 27 60 27 Q89 27 85 60 Q80 43 60 41 Q40 43 35 60Z';
+  let back='', front='';
+  switch(p.style){
+    case 'short': front=`<path d="${capPath}" fill="${hr}"/>`; break;
+    case 'side': front=`<path d="M35 60 Q31 26 62 26 Q91 28 85 58 Q77 39 52 43 Q41 47 35 60Z" fill="${hr}"/>`; break;
+    case 'bun': back=`<circle cx="60" cy="22" r="11" fill="${hr}"/>`; front=`<path d="${capPath}" fill="${hr}"/>`; break;
+    case 'long': back=`<path d="M31 60 Q27 24 60 24 Q93 24 89 60 L92 108 L28 108Z" fill="${hr}"/>`; front=`<path d="M35 60 Q33 30 60 29 Q87 30 85 60 Q78 42 58 42 Q42 45 35 60Z" fill="${hr}"/>`; break;
+    case 'bob': back=`<path d="M31 60 Q27 24 60 24 Q93 24 89 60 L90 86 L30 86Z" fill="${hr}"/>`; front=`<path d="M35 60 Q33 30 60 29 Q87 30 85 60 Q80 41 56 43 Q41 47 35 60Z" fill="${hr}"/>`; break;
+    case 'curly': front=[[40,40,9],[50,31,10],[62,28,10],[74,32,10],[82,42,9],[36,52,7],[85,53,7],[56,38,8],[68,38,8]].map(c=>`<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="${hr}"/>`).join(''); break;
+    case 'bald': front=`<path d="M35 64 Q32 52 37 46 L39 64Z M85 64 Q88 52 83 46 L81 64Z" fill="${hr}"/>`; break;
+  }
+  const mouth = p.mouth==='smirk' ? 'M52 78 Q60 82 69 76' : p.mouth==='frown' ? 'M52 80 Q60 75 68 80' : 'M53 78 Q60 81 67 78';
+  let acc='';
+  if(p.beard) acc+=`<path d="M38 68 Q40 94 60 96 Q80 94 82 68 Q78 82 60 84 Q42 82 38 68Z" fill="${p.beardColor||hr}"/>`;
+  if(p.goatee) acc+=`<path d="M52 82 Q60 96 68 82 Q60 86 52 82Z" fill="${p.beardColor||hr}"/>`;
+  if(p.mustache) acc+=`<path d="M48 74 Q54 69 60 73 Q66 69 72 74 Q66 77 60 75 Q54 77 48 74Z" fill="${p.beardColor||hr}"/>`;
+  if(p.glasses) acc+=`<g fill="none" stroke="${p.glasses}" stroke-width="2.4"><circle cx="49" cy="62" r="8"/><circle cx="71" cy="62" r="8"/><path d="M57 62h6M41 61l-6-2M79 61l6-2"/></g>`;
+  if(p.earrings) acc+=`<circle cx="35" cy="72" r="3" fill="${p.earrings}"/><circle cx="85" cy="72" r="3" fill="${p.earrings}"/>`;
+  if(p.clip) acc+=`<path d="M70 40l12 5" stroke="#d9dce8" stroke-width="3" stroke-linecap="round"/>`;
+  if(p.cap) acc+=`<path d="M32 46 Q34 20 60 20 Q86 20 88 46Z" fill="${p.cap}"/><rect x="30" y="43" width="60" height="7" rx="2" fill="${p.capPlain?p.cap:'#0d1224'}"/>${p.capPlain?'':'<rect x="52" y="30" width="16" height="8" rx="1" fill="#d7b24a"/>'}`;
+  let neckwear='';
+  if(p.bowtie) neckwear=`<path d="M60 102l-12-7v14zM60 102l12-7v14z" fill="${p.bowtie}"/>`;
+  if(p.pearls) neckwear=[46,51,56,60,64,69,74].map((x,i)=>`<circle cx="${x}" cy="${100+[0,3,5,6,5,3,0][i]}" r="2.3" fill="#f3efe4"/>`).join('');
+  if(p.vest) neckwear+=`<path d="M30 140 L40 104 L52 100 L56 140Z M90 140 L80 104 L68 100 L64 140Z" fill="${p.vest}"/><path d="M34 126h20M66 126h20" stroke="#fff" stroke-width="3" opacity=".8"/>`;
+  const shirt = p.shirt ? `<path d="M50 98 L60 114 L70 98Z" fill="${p.shirt}"/>` : '';
+  return `<svg class="pic" viewBox="0 0 120 140" role="img" aria-label="Retrato de ${p.name||'suspeito'}">
+  <rect width="120" height="140" fill="${bg}"/>
+  <g stroke="#0f1629" stroke-opacity=".16" stroke-width="1"><path d="M0 20h120M0 44h120M0 68h120M0 92h120M0 116h120"/></g>
+  ${back}
+  <path d="M12 140 Q12 106 44 99 L76 99 Q108 106 108 140Z" fill="${cl}"/>
+  ${shirt}
+  <rect x="51" y="84" width="18" height="18" fill="${sk}"/>
+  <path d="M51 92 Q60 99 69 92 L69 86 L51 86Z" fill="#000" opacity=".12"/>
+  <ellipse cx="35" cy="64" rx="4" ry="6" fill="${sk}"/><ellipse cx="85" cy="64" rx="4" ry="6" fill="${sk}"/>
+  <ellipse cx="60" cy="62" rx="24" ry="28" fill="${sk}"/>
+  <circle cx="49" cy="62" r="2.4" fill="#141826"/><circle cx="71" cy="62" r="2.4" fill="#141826"/>
+  <path d="M43 54q6-4 12-1M65 53q6-3 12 1" fill="none" stroke="${p.brow||hr}" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M60 64v8q2 2 4 0" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="${mouth}" fill="none" stroke="#7a2e2e" stroke-width="2.2" stroke-linecap="round"/>
+  ${front}${acc}${neckwear}
+  </svg>`;
+}
+const stampTime = (x,y,t)=>`<text x="${x}" y="${y}" class="t-mono" font-size="9" fill="#ffd34d" text-anchor="end">${t}</text>`;
+
+const ART = {
+/* ---------------- CASO 1 ---------------- */
+teatroPlanta(){ return `<svg viewBox="0 0 360 262" role="img" aria-label="Planta do teatro">
+  <rect width="360" height="262" fill="#16203a"/>
+  <rect x="296" y="92" width="58" height="84" fill="#27503a"/><text x="325" y="112" class="t-mono" font-size="8.5" fill="#bfe6c9" text-anchor="middle">JARDIM</text>
+  <text x="325" y="124" class="t-mono" font-size="7" fill="#bfe6c9" text-anchor="middle">(canteiro)</text>
+  <rect x="6" y="100" width="48" height="96" fill="#2a3040"/><text x="30" y="150" class="t-mono" font-size="7.5" fill="#c9d2ea" text-anchor="middle" transform="rotate(-90 30 150)">ESTACIONAMENTO</text>
+  <g fill="#e9ece3" stroke="#1c2135" stroke-width="2">
+    <rect x="60" y="20" width="232" height="58"/>
+    <rect x="60" y="78" width="232" height="24"/>
+    <rect x="60" y="102" width="90" height="66"/>
+    <rect x="150" y="102" width="46" height="66"/>
+    <rect x="196" y="102" width="46" height="66"/>
+    <rect x="242" y="102" width="50" height="66"/>
+    <rect x="60" y="168" width="232" height="56"/>
+  </g>
+  <path d="M150 196v28M214 196v28" stroke="#1c2135" stroke-width="2" stroke-dasharray="4 3"/>
+  <g class="t-disp" fill="#1c2135" text-anchor="middle">
+    <text x="176" y="54" font-size="18">PALCO</text>
+  </g>
+  <g class="t-mono" fill="#1c2135" text-anchor="middle" font-size="7.5">
+    <text x="176" y="93">CORREDOR DOS CAMARINS</text>
+    <text x="105" y="126">SALA DE</text><text x="105" y="136">ENSAIO</text><text x="105" y="150" font-size="6.5">(piano)</text>
+    <text x="173" y="132">CAM. 1</text><text x="219" y="132">CAM. 2</text>
+    <text x="267" y="128" font-weight="600">CAM. 3</text><text x="267" y="139" font-size="6.5">(Helena)</text>
+    <text x="105" y="200">PORTARIA</text><text x="182" y="200">BILHETERIA</text><text x="253" y="200">SAGUÃO</text>
+  </g>
+  <rect x="290" y="120" width="5" height="26" fill="#6fb6e8" stroke="#1c2135" stroke-width="1"/>
+  <text x="300" y="150" class="t-mono" font-size="7" fill="#e8ecf7">janela</text>
+  <rect x="57" y="120" width="6" height="24" fill="#e5483d"/>
+  <text x="12" y="92" class="t-mono" font-size="7" fill="#ffb3ad">SAÍDA LATERAL</text>
+  <text x="12" y="212" class="t-mono" font-size="6.5" fill="#ffb3ad">só abre por dentro</text>
+  <path d="M34 96 L56 122" stroke="#ffb3ad" stroke-width="1"/>
+  <rect x="236" y="222" width="34" height="5" fill="#f3c62f"/>
+  <text x="253" y="240" class="t-mono" font-size="7.5" fill="#e8ecf7" text-anchor="middle">ENTRADA PRINCIPAL</text>
+  <text x="176" y="254" class="t-mono" font-size="7" fill="#9ba7c9" text-anchor="middle">Rua do Teatro</text>
+  <g fill="#1c2135"><rect x="126" y="80" width="12" height="3"/><rect x="166" y="100" width="12" height="3"/><rect x="212" y="100" width="12" height="3"/><rect x="258" y="100" width="12" height="3"/><rect x="100" y="166" width="12" height="3"/><rect x="170" y="76" width="14" height="3"/></g>
+  </svg>`; },
+cabideiro(){ return `<svg viewBox="0 0 340 250" role="img" aria-label="Cabideiro com casacos">
+  <rect width="340" height="250" fill="#c9d0d9"/><rect y="204" width="340" height="46" fill="#7d6247"/>
+  <path d="M0 204h340" stroke="#4d3b29" stroke-width="3"/>
+  <g stroke="#6a533c" stroke-width="1" opacity=".6"><path d="M0 220h340M0 236h340M60 204v46M150 220v30M240 204v46"/></g>
+  <rect x="24" y="34" width="292" height="12" rx="2" fill="#4d3b29"/>
+  <g fill="#2c2118"><circle cx="70" cy="46" r="5"/><circle cx="140" cy="46" r="5"/><circle cx="212" cy="46" r="5"/><circle cx="280" cy="46" r="5"/></g>
+  <!-- casaco cinza, seco -->
+  <path d="M52 52 L88 52 L100 178 L40 178Z" fill="#7b8494"/><path d="M70 52v126" stroke="#5e6676" stroke-width="2"/>
+  <path d="M52 52 L36 120 L46 124 L58 70Z M88 52 L104 120 L94 124 L82 70Z" fill="#6b7484"/>
+  <!-- sobretudo mostarda, molhado -->
+  <path d="M121 52 L159 52 L172 184 L108 184Z" fill="#c99a2b"/>
+  <path d="M112 150 L168 150 L172 184 L108 184Z" fill="#9c741a"/>
+  <path d="M121 52 L104 124 L115 128 L128 72Z M159 52 L176 124 L165 128 L152 72Z" fill="#b08422"/>
+  <path d="M140 52v132" stroke="#8a6717" stroke-width="2"/>
+  <g fill="#3f4a5c" opacity=".5"><ellipse cx="128" cy="92" rx="5" ry="9"/><ellipse cx="152" cy="118" rx="6" ry="11"/><ellipse cx="124" cy="136" rx="4" ry="8"/></g>
+  <g fill="#5d8fd0"><path d="M118 190q-4 7 0 9q4-2 0-9z"/><path d="M140 194q-4 7 0 9q4-2 0-9z"/><path d="M160 189q-4 7 0 9q4-2 0-9z"/><path d="M150 176q-3 6 0 8q3-2 0-8z"/></g>
+  <ellipse cx="140" cy="220" rx="40" ry="8" fill="#4f7fb8" opacity=".85"/><ellipse cx="132" cy="218" rx="14" ry="2.5" fill="#bcd7f5" opacity=".7"/>
+  <!-- cachecol -->
+  <path d="M204 50 q8 -6 16 0 l6 96 l-12 0 l-2 -70 l-4 86 l-12 0z" fill="#7a2338"/>
+  <g stroke="#a9455c" stroke-width="1.5"><path d="M198 150l12 2M212 140l12 2"/></g>
+  <!-- chapéu -->
+  <path d="M258 62 q22 -26 44 0z" fill="#2f3443"/><ellipse cx="280" cy="63" rx="32" ry="6" fill="#2f3443"/><path d="M260 58q20 5 40 0" stroke="#b9902d" stroke-width="3" fill="none"/>
+  <rect x="216" y="226" width="118" height="18" fill="#0f1629" opacity=".75"/>
+  ${stampTime(330,239,'SALA DE ENSAIO · 19:10')}
+  </svg>`; },
+canteiro(){ return `<svg viewBox="0 0 340 250" role="img" aria-label="Canteiro sob a janela aberta">
+  <rect width="340" height="250" fill="#8f7b68"/>
+  <g stroke="#7a6756" stroke-width="1.5"><path d="M0 26h340M0 52h340M0 78h340M0 104h340M0 130h340M40 0v26M120 0v26M200 0v26M280 0v26M80 26v26M160 26v26M240 26v26M320 26v26M40 52v26M280 52v26M80 78v26M320 78v26M40 104v26M280 104v26M80 130v24M160 130v24M240 130v24"/></g>
+  <rect x="104" y="14" width="132" height="112" fill="#e9ece3"/><rect x="112" y="22" width="116" height="96" fill="#0b1020"/>
+  <path d="M228 22 L262 10 L262 110 L228 118Z" fill="#a9c9e6" opacity=".75" stroke="#e9ece3" stroke-width="4"/>
+  <path d="M112 100 q30 -18 60 0 t56 0v18h-116z" fill="#18203a"/>
+  <rect x="98" y="124" width="144" height="8" fill="#d5dacb"/>
+  <rect y="154" width="340" height="70" fill="#35241c"/>
+  <g fill="#4a342a"><ellipse cx="60" cy="176" rx="34" ry="6"/><ellipse cx="170" cy="196" rx="46" ry="7"/><ellipse cx="270" cy="178" rx="38" ry="6"/><ellipse cx="110" cy="210" rx="30" ry="5"/><ellipse cx="250" cy="208" rx="34" ry="5"/></g>
+  <g fill="#8fb1d6" opacity=".55"><ellipse cx="170" cy="194" rx="20" ry="2.5"/><ellipse cx="62" cy="175" rx="12" ry="2"/><ellipse cx="268" cy="177" rx="14" ry="2"/></g>
+  <g stroke="#2f7a45" stroke-width="3" stroke-linecap="round"><path d="M40 190v-26M92 196v-30M146 186v-24M200 190v-28M252 194v-30M304 188v-26"/></g>
+  <g><circle cx="40" cy="160" r="7" fill="#e86a8a"/><circle cx="92" cy="162" r="7" fill="#f3c62f"/><circle cx="146" cy="158" r="7" fill="#e86a8a"/><circle cx="200" cy="158" r="7" fill="#f6f1e4"/><circle cx="252" cy="160" r="7" fill="#f3c62f"/><circle cx="304" cy="158" r="7" fill="#e86a8a"/></g>
+  <g fill="#fff8d6"><circle cx="40" cy="160" r="2.5"/><circle cx="92" cy="162" r="2.5"/><circle cx="146" cy="158" r="2.5"/><circle cx="200" cy="158" r="2.5"/><circle cx="252" cy="160" r="2.5"/><circle cx="304" cy="158" r="2.5"/></g>
+  <rect y="224" width="340" height="26" fill="#55606e"/>
+  <g fill="#6b7785"><rect x="4" y="220" width="50" height="10" rx="3"/><rect x="60" y="220" width="56" height="10" rx="3"/><rect x="122" y="220" width="48" height="10" rx="3"/><rect x="176" y="220" width="58" height="10" rx="3"/><rect x="240" y="220" width="46" height="10" rx="3"/><rect x="292" y="220" width="46" height="10" rx="3"/></g>
+  <g stroke="#cfe2f7" stroke-width="1.3" opacity=".55"><path d="M20 0l-8 30M70 20l-8 30M300 6l-8 30M330 60l-8 30M24 90l-8 30M80 110l-8 30M290 96l-8 30M320 132l-8 22M50 136l-6 18M266 30l-8 30"/></g>
+  <rect x="190" y="230" width="146" height="16" fill="#0f1629" opacity=".8"/>
+  ${stampTime(332,242,'JANELA DO CAMARIM 3 · 19:15')}
+  </svg>`; },
+feltro(){ return `<svg viewBox="0 0 340 210" role="img" aria-label="Trinco da saída lateral com tira de feltro">
+  <rect width="340" height="210" fill="#0b1020"/>
+  <rect x="0" y="0" width="156" height="210" fill="#5f7a72"/><rect x="0" y="0" width="156" height="210" fill="url(#g1)" opacity=".2"/>
+  <rect x="196" y="0" width="144" height="210" fill="#cfd3c4"/>
+  <rect x="196" y="0" width="10" height="210" fill="#aeb39f"/>
+  <rect x="20" y="86" width="136" height="18" rx="4" fill="#c0392f"/><rect x="20" y="86" width="136" height="6" rx="3" fill="#e2675c"/>
+  <text x="34" y="74" class="t-disp" font-size="13" fill="#e9ece3">EMPURRE</text>
+  <rect x="140" y="80" width="18" height="30" fill="#8d949c"/>
+  <rect x="196" y="74" width="14" height="44" fill="#b9902d"/><rect x="199" y="84" width="8" height="24" fill="#3a2e10"/>
+  <path d="M146 90 L214 84 L216 102 L148 108Z" fill="#d42a35"/><path d="M146 90 L214 84 L214.5 88 L146.4 94Z" fill="#f06a72"/>
+  <g stroke="#9c1a24" stroke-width="1" opacity=".7"><path d="M160 92l1 14M176 90l1 15M192 89l1 14"/></g>
+  <text x="270" y="40" class="t-disp" font-size="22" fill="#27503a" text-anchor="middle">SAÍDA</text>
+  <rect x="204" y="188" width="132" height="16" fill="#0f1629" opacity=".85"/>
+  ${stampTime(332,200,'SAÍDA LATERAL · 19:20')}
+  </svg>`; },
+
+/* ---------------- CASO 2 ---------------- */
+fotoVazada(){
+  const rows=[['01 C','02 A','03 E','04 B','05 D'],['06 B','07 D','08 A','09 C','10 E'],['11 A','12 C','13 B','14 E','15 D'],['16 E','17 B','18 D','19 A','20 C']];
+  const txt=rows.map((r,i)=>r.map((c,j)=>`<text x="${44+j*38}" y="${116+i*30}" class="t-mono" font-size="11" fill="#1b1b1f">${c}</text>`).join('')).join('');
+  return `<svg viewBox="0 0 340 400" role="img" aria-label="Foto vazada do gabarito">
+  <defs><filter id="bl"><feGaussianBlur stdDeviation="3.2"/></filter><radialGradient id="vg" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient></defs>
+  <rect width="340" height="400" fill="#5c4331"/>
+  <g stroke="#4a3526" stroke-width="2" opacity=".7"><path d="M0 60q170 14 340 0M0 150q170 -12 340 4M0 250q170 16 340 -4M0 340q170 -10 340 6"/></g>
+  <rect x="150" y="-14" width="210" height="62" rx="4" fill="#1d1f27"/>
+  <g fill="#343846">${Array.from({length:9},(_,i)=>`<rect x="${158+i*20}" y="6" width="16" height="12" rx="2"/><rect x="${158+i*20}" y="24" width="16" height="12" rx="2"/>`).join('')}</g>
+  <rect x="96" y="14" width="44" height="18" fill="#f3c62f" transform="rotate(-6 118 23)"/><text x="118" y="28" class="t-disp" font-size="14" fill="#1b1b1f" text-anchor="middle" transform="rotate(-6 118 23)">PC2</text>
+  <g transform="rotate(-4 170 220)">
+    <rect x="28" y="56" width="246" height="318" fill="#f6f5ef"/>
+    <text x="42" y="78" class="t-disp" font-size="13" fill="#1b1b1f" textLength="200" lengthAdjust="spacingAndGlyphs">COLÉGIO ATLAS · PROVA DA BOLSA</text>
+    <text x="42" y="94" class="t-mono" font-size="10" fill="#1b1b1f">GABARITO OFICIAL — CONFIDENCIAL</text>
+    <path d="M42 100h218" stroke="#1b1b1f" stroke-width="1.5"/>
+    ${txt}
+    <g filter="url(#bl)"><rect x="36" y="160" width="232" height="56" fill="#dcdad0"/></g>
+    <text x="42" y="362" class="t-mono" font-size="7.5" fill="#44464f">COORD-IMP01 · job #215 · impr. 20:14 · rmeireles@PC2</text>
+    <g transform="translate(240 322) rotate(18)"><ellipse rx="15" ry="21" fill="#141418" opacity=".82"/><g fill="none" stroke="#f6f5ef" stroke-width="1.1" opacity=".5"><ellipse rx="11" ry="16"/><ellipse rx="7" ry="11"/><ellipse rx="3.5" ry="6"/></g></g>
+    <ellipse cx="218" cy="344" rx="6" ry="4" fill="#141418" opacity=".5"/>
+  </g>
+  <rect width="340" height="400" fill="url(#vg)"/>
+  </svg>`; },
+futsal(){
+  const player=(x,y,s,num,name,c)=>`<g transform="translate(${x} ${y}) scale(${s})"><circle cx="0" cy="-34" r="8" fill="#b9825e"/><path d="M-9 -38 q9 -10 18 0 q-9 -4 -18 0z" fill="#20160f"/><path d="M-13 -24 h26 l5 30 h-36z" fill="${c}"/><path d="M-13 -24 l-9 16 6 4 6 -10z M13 -24 l9 16 -6 4 -6 -10z" fill="${c}"/><rect x="-11" y="6" width="22" height="12" fill="#111a33"/><rect x="-10" y="18" width="7" height="20" fill="#b9825e"/><rect x="3" y="18" width="7" height="20" fill="#b9825e"/>${name?`<text y="-13" class="t-mono" font-size="6.5" font-weight="600" fill="#fff" text-anchor="middle">${name}</text>`:''}<text y="2" class="t-disp" font-size="14" fill="#fff" text-anchor="middle">${num}</text></g>`;
+  return `<svg viewBox="0 0 360 260" role="img" aria-label="Foto do treino de futsal">
+  <rect width="360" height="260" fill="#232c47"/>
+  <rect x="112" y="8" width="136" height="44" rx="3" fill="#06070b" stroke="#444c66" stroke-width="2"/>
+  <text x="180" y="27" class="t-mono" font-size="11" font-weight="600" fill="#ff4b3e" text-anchor="middle">ATLAS 3 × 2 VISIT.</text>
+  <text x="180" y="45" class="t-mono" font-size="14" font-weight="600" fill="#ffd34d" text-anchor="middle">20:15</text>
+  <g fill="#39446a"><rect x="0" y="62" width="360" height="14"/><rect x="0" y="80" width="360" height="14"/><rect x="0" y="98" width="360" height="14"/></g>
+  <g fill="#151b30">${[150,176,214,262,300,330].map((x,i)=>`<circle cx="${x}" cy="${[70,88,70,88,70,88][i]}" r="6"/><rect x="${x-7}" y="${[76,94,76,94,76,94][i]}" width="14" height="12" rx="3"/>`).join('')}</g>
+  <rect y="112" width="360" height="148" fill="#c48a4a"/>
+  <g stroke="#f4e9d2" stroke-width="2.5" fill="none"><path d="M0 128h360M180 128v132"/><circle cx="180" cy="200" r="34"/><path d="M360 160h-40v70h40"/></g>
+  <g stroke="#e9ece3" stroke-width="3" fill="none"><path d="M352 150v-34h-34v34"/></g>
+  <path d="M0 112h106" stroke="#8b93ad" stroke-width="4"/>
+  <!-- figura de colete -->
+  <g transform="translate(52 118)">
+    <circle cx="0" cy="-66" r="9" fill="#d9752a"/>
+    <circle cx="0" cy="-48" r="13" fill="#e2b48c"/><path d="M-13 -50 q13 -16 26 0 q-13 -6 -26 0z" fill="#d9752a"/>
+    <g fill="none" stroke="#d8362c" stroke-width="1.8"><circle cx="-5" cy="-48" r="4"/><circle cx="5" cy="-48" r="4"/></g>
+    <path d="M-18 -32 h36 l4 44 h-44z" fill="#37415f"/>
+    <path d="M-17 -32 h14 l3 40 h-21z M17 -32 h-14 l-3 40 h21z" fill="#f3d21f"/>
+    <rect x="-20" y="-8" width="40" height="5" fill="#fff" opacity=".85"/>
+    <text y="-15" class="t-mono" font-size="6.2" font-weight="600" fill="#1b1b1f" text-anchor="middle">INSPETORIA</text>
+    <rect x="-14" y="12" width="12" height="26" fill="#1d2338"/><rect x="2" y="12" width="12" height="26" fill="#1d2338"/>
+  </g>
+  ${player(150,196,1,'10','','#2456c9')}
+  ${player(232,214,1.15,'7','CAIO','#2456c9')}
+  ${player(300,188,.9,'4','','#2456c9')}
+  <circle cx="268" cy="236" r="7" fill="#f6f5ef" stroke="#1b1b1f" stroke-width="1.5"/>
+  <rect x="210" y="242" width="146" height="14" fill="#0f1629" opacity=".8"/>
+  ${stampTime(352,252,'@atlasfutsal · postado 20:16')}
+  </svg>`; },
+mesaRaul(){ return `<svg viewBox="0 0 340 230" role="img" aria-label="Mesa do professor Raul">
+  <rect width="340" height="230" fill="#aeb6c6"/><rect y="128" width="340" height="102" fill="#6a4f3a"/>
+  <rect x="96" y="18" width="150" height="96" rx="5" fill="#161a24"/><rect x="104" y="26" width="134" height="76" fill="#27365f"/>
+  <text x="171" y="62" class="t-mono" font-size="9" fill="#9fb4e6" text-anchor="middle">Usuário: rmeireles</text><rect x="131" y="70" width="80" height="12" rx="2" fill="#0f1629"/><text x="171" y="79" class="t-mono" font-size="8" fill="#9fb4e6" text-anchor="middle">senha: ••••••••</text>
+  <rect x="158" y="114" width="26" height="14" fill="#161a24"/><rect x="136" y="126" width="70" height="6" rx="2" fill="#161a24"/>
+  <rect x="214" y="96" width="34" height="14" fill="#f3c62f"/><text x="231" y="107" class="t-disp" font-size="11" fill="#1b1b1f" text-anchor="middle">PC2</text>
+  <rect x="146" y="160" width="100" height="52" fill="#f7e36a" transform="rotate(5 188 186)"/>
+  <g transform="rotate(5 188 186)"><text x="158" y="182" class="t-hand" font-size="13" fill="#1d2a52">senha:</text><text x="152" y="200" class="t-hand" font-size="12" font-weight="700" fill="#1d2a52" textLength="86" lengthAdjust="spacingAndGlyphs">Pitagoras1975</text></g>
+  <g transform="rotate(-14 120 160)"><rect x="40" y="136" width="170" height="44" rx="4" fill="#1d1f27"/><g fill="#3a3f50">${Array.from({length:10},(_,i)=>`<rect x="${47+i*16}" y="142" width="12" height="9" rx="1.5"/><rect x="${47+i*16}" y="155" width="12" height="9" rx="1.5"/>`).join('')}</g></g>
+  <path d="M258 150h34v34q-17 10-34 0z" fill="#e9ece3"/><path d="M292 158q14 0 12 12t-12 8" fill="none" stroke="#e9ece3" stroke-width="5"/><ellipse cx="275" cy="151" rx="17" ry="4" fill="#3a2416"/>
+  <rect x="196" y="212" width="140" height="14" fill="#0f1629" opacity=".8"/>
+  ${stampTime(332,222,'COORDENAÇÃO · mesa do prof. Raul')}
+  </svg>`; },
+
+/* ---------------- CASO 3 ---------------- */
+trem(){
+  const car=(y,h,label)=>`<rect x="20" y="${y}" width="300" height="${h}" rx="6" fill="#e9ece3" stroke="#1c2135" stroke-width="2"/><text x="28" y="${y+12}" class="t-mono" font-size="7.5" font-weight="600" fill="#4d566f">${label}</text>`;
+  return `<svg viewBox="0 0 340 344" role="img" aria-label="Composição do Expresso Serra Azul">
+  <rect width="340" height="344" fill="#16203a"/>
+  <path d="M170 0v344" stroke="#33416d" stroke-width="10"/>
+  <path d="M40 4 Q170 -18 300 4 L320 40 L20 40Z" fill="#b6332b" stroke="#1c2135" stroke-width="2"/>
+  <text x="170" y="28" class="t-disp" font-size="14" fill="#fff" text-anchor="middle">LOCOMOTIVA · maquinista</text>
+  ${car(48,64,'VAGÃO A · CABINES')}
+  <g stroke="#1c2135" stroke-width="1.5" fill="#fff">${[0,1,2,3].map(i=>`<rect x="${30+i*71}" y="66" width="66" height="38"/>`).join('')}</g>
+  <g class="t-mono" text-anchor="middle" fill="#1c2135">${['Albano','Verônica','Emílio','Bárbara'].map((n,i)=>`<text x="${63+i*71}" y="82" font-size="11" font-weight="600">${i+1}</text><text x="${63+i*71}" y="96" font-size="8">${n}</text>`).join('')}</g>
+  ${car(120,58,'VAGÃO B · RESTAURANTE')}
+  <g fill="#c9a36a" stroke="#1c2135" stroke-width="1">${[0,1,2,3].map(i=>`<rect x="${44+i*62}" y="142" width="34" height="22" rx="3"/>`).join('')}</g>
+  <g class="t-mono" font-size="7" text-anchor="middle" fill="#1c2135">${[1,2,3,4].map((n,i)=>`<text x="${61+i*62}" y="156">mesa ${n}</text>`).join('')}</g>
+  <rect x="286" y="134" width="24" height="36" fill="#7a2338"/><text x="298" y="156" class="t-mono" font-size="6.5" fill="#fff" text-anchor="middle">bar</text>
+  ${car(186,62,'VAGÃO C · POLTRONAS')}
+  <g fill="#8a94b4">${Array.from({length:12},(_,i)=>`<rect x="${34+(i%6)*44}" y="${206+Math.floor(i/6)*20}" width="26" height="12" rx="3"/>`).join('')}</g>
+  <rect x="254" y="226" width="26" height="12" rx="3" fill="#f3c62f" stroke="#1c2135"/>
+  <text x="267" y="246" class="t-mono" font-size="6.8" font-weight="600" fill="#1c2135" text-anchor="middle">Dona Olga</text>
+  ${car(256,72,'VAGÃO D · BAGAGENS')}
+  <rect x="150" y="246" width="40" height="12" fill="#e5483d" stroke="#1c2135" stroke-width="1.5"/>
+  <text x="312" y="270" class="t-mono" font-size="6.5" fill="#b3231a" text-anchor="end">trancada · chave: chefe de trem</text>
+  <g fill="#b9a887" stroke="#1c2135" stroke-width="1"><rect x="34" y="284" width="40" height="30"/><rect x="80" y="292" width="30" height="22"/><rect x="232" y="288" width="44" height="26"/></g>
+  <path d="M150 316 q0 -34 20 -34 q20 0 20 34z" fill="#cfe6f5" stroke="#1c2135" stroke-width="1.5" opacity=".9"/><rect x="144" y="314" width="52" height="6" fill="#1c2135"/>
+  <path d="M162 304l4-5h8l4 5-4 5h-8z" fill="#1fa35c"/>
+  <text x="170" y="337" class="t-mono" font-size="7.5" fill="#e8ecf7" text-anchor="middle">redoma com a esmeralda</text>
+  </svg>`; },
+gem8(cx,cy,w,h,c){ const a=w/2,b=h/2; const pts=[[cx-a+c,cy-b],[cx+a-c,cy-b],[cx+a,cy-b+c],[cx+a,cy+b-c],[cx+a-c,cy+b],[cx-a+c,cy+b],[cx-a,cy+b-c],[cx-a,cy-b+c]].map(p=>p.join(',')).join(' ');
+  const k=.62; const pts2=[[cx-a*k+c*k,cy-b*k],[cx+a*k-c*k,cy-b*k],[cx+a*k,cy-b*k+c*k],[cx+a*k,cy+b*k-c*k],[cx+a*k-c*k,cy+b*k],[cx-a*k+c*k,cy+b*k],[cx-a*k,cy+b*k-c*k],[cx-a*k,cy-b*k+c*k]].map(p=>p.join(',')).join(' ');
+  return `<polygon points="${pts}" fill="#178f52" stroke="#0a4a2a" stroke-width="1.5"/><polygon points="${pts2}" fill="#3fd08a" stroke="#0a4a2a" stroke-width="1"/>`; },
+gem6(cx,cy,w,h){ const a=w/2,b=h/2,m=w*.36; const f=(k)=>[[cx-a*k,cy],[cx-m*k,cy-b*k],[cx+m*k,cy-b*k],[cx+a*k,cy],[cx+m*k,cy+b*k],[cx-m*k,cy+b*k]].map(p=>p.join(',')).join(' ');
+  return `<polygon points="${f(1)}" fill="#178f52" stroke="#0a4a2a" stroke-width="1.5"/><polygon points="${f(.62)}" fill="#3fd08a" stroke="#0a4a2a" stroke-width="1"/>`; },
+certificado(){ return `<svg viewBox="0 0 340 240" role="img" aria-label="Certificado da Esmeralda Jaguar">
+  <rect width="340" height="240" fill="#efe9d6"/><rect x="8" y="8" width="324" height="224" fill="none" stroke="#7a6a3a" stroke-width="2"/><rect x="13" y="13" width="314" height="214" fill="none" stroke="#7a6a3a" stroke-width=".8"/>
+  <text x="170" y="38" class="t-disp" font-size="17" fill="#2a2412" text-anchor="middle">CERTIFICADO DE AUTENTICIDADE</text>
+  <text x="170" y="52" class="t-mono" font-size="8" fill="#5a4f2c" text-anchor="middle">CASA DE LEILÕES AURORA · LOTE 17</text>
+  ${ART.gem8(170,110,104,72,18)}
+  <path d="M132 86l20 10M150 84l8 12" stroke="#fff" stroke-width="2" opacity=".6"/>
+  <text x="170" y="170" class="t-disp" font-size="20" fill="#2a2412" text-anchor="middle">ESMERALDA JAGUAR</text>
+  <text x="170" y="186" class="t-mono" font-size="8.5" fill="#2a2412" text-anchor="middle">38,2 quilates · Muzo, Colômbia · lapidação degrau</text>
+  <text x="170" y="199" class="t-mono" font-size="8" fill="#5a4f2c" text-anchor="middle">desenho em escala 2:1, vista de cima</text>
+  <path d="M206 216q14 -12 24 -2t18 -6t20 4" fill="none" stroke="#1d2a52" stroke-width="1.5"/><text x="60" y="220" class="t-mono" font-size="7" fill="#5a4f2c">Perito gemólogo responsável</text>
+  <circle cx="290" cy="60" r="20" fill="none" stroke="#b3231a" stroke-width="2"/><text x="290" y="63" class="t-disp" font-size="9" fill="#b3231a" text-anchor="middle">GENUÍNA</text>
+  </svg>`; },
+pedraFalsa(){ return `<svg viewBox="0 0 340 220" role="img" aria-label="Pedra encontrada na redoma às 23:30">
+  <rect width="340" height="220" fill="#1a1d28"/>
+  <ellipse cx="170" cy="118" rx="126" ry="74" fill="#5a1626"/><ellipse cx="170" cy="112" rx="112" ry="62" fill="#7a2338"/>
+  ${ART.gem6(170,110,112,76)}
+  <path d="M130 96l22 8" stroke="#fff" stroke-width="2" opacity=".5"/>
+  <rect x="14" y="14" width="96" height="34" fill="#f3c62f" transform="rotate(-4 62 31)"/>
+  <g transform="rotate(-4 62 31)"><text x="62" y="29" class="t-disp" font-size="12" fill="#1b1b1f" text-anchor="middle">APREENDIDA</text><text x="62" y="42" class="t-mono" font-size="8" fill="#1b1b1f" text-anchor="middle">redoma · 23:30</text></g>
+  <rect x="204" y="198" width="132" height="16" fill="#0f1629" opacity=".85"/>
+  ${stampTime(332,210,'vista de cima · escala 2:1')}
+  </svg>`; },
+contato(){
+  const fr=(x,y,file,time,inner)=>`<g transform="translate(${x} ${y})"><rect width="152" height="104" fill="#000"/><svg x="3" y="3" width="146" height="98" viewBox="0 0 146 98">${inner}</svg><text x="0" y="118" class="t-mono" font-size="8" fill="#e8ecf7">${file}</text><text x="152" y="118" class="t-mono" font-size="9" font-weight="600" fill="#ffd34d" text-anchor="end">${time}</text></g>`;
+  const f1=`<rect width="146" height="98" fill="#0d1429"/><rect y="70" width="146" height="28" fill="#3b3f4c"/><rect x="10" y="30" width="126" height="40" rx="6" fill="#b6332b"/><g fill="#ffe9a3">${[0,1,2,3,4].map(i=>`<rect x="${20+i*23}" y="38" width="15" height="12"/>`).join('')}</g><circle cx="120" cy="14" r="5" fill="#f6f1e4"/><text x="73" y="64" class="t-disp" font-size="9" fill="#fff" text-anchor="middle">EXPRESSO SERRA AZUL</text>`;
+  const f2=`<rect width="146" height="98" fill="#5b5445"/><rect x="78" y="6" width="54" height="92" fill="#2b2a26" stroke="#8d8672" stroke-width="2"/><circle cx="124" cy="54" r="3" fill="#d7b24a"/><text x="105" y="24" class="t-disp" font-size="12" fill="#e9ece3" text-anchor="middle">D</text><circle cx="46" cy="34" r="11" fill="#c99672"/><path d="M33 30 q13 -18 26 0z" fill="#1b2748"/><rect x="31" y="28" width="30" height="4" fill="#0d1224"/><path d="M40 39q6 4 12 0" stroke="#3a2416" stroke-width="2.5" fill="none"/><path d="M26 98 q0 -44 20 -50 q20 6 20 50z" fill="#1b2748"/><path d="M64 62 l14 -6" stroke="#c99672" stroke-width="5" stroke-linecap="round"/><circle cx="82" cy="54" r="4" fill="none" stroke="#d7b24a" stroke-width="2"/>`;
+  const cushion=`<rect width="146" height="98" fill="#20222c"/><ellipse cx="73" cy="60" rx="58" ry="30" fill="#7a2338"/>`;
+  const f3=cushion+`<path d="M22 86 q0 -80 51 -80 q51 0 51 80z" fill="#cfe6f5" opacity=".2" stroke="#e6f3fb" stroke-width="1.5"/>${ART.gem8(73,58,46,32,8)}<path d="M36 78 L70 14 L80 14 L50 78Z" fill="#fff" opacity=".55"/><path d="M96 30 l10 -14" stroke="#fff" stroke-width="3" opacity=".6"/>`;
+  const f4=cushion+`${ART.gem6(73,58,46,32)}<path d="M124 96 q0 -70 40 -70" fill="none" stroke="#e6f3fb" stroke-width="1.5" opacity=".7"/><path d="M130 96 q2 -50 30 -62v62z" fill="#cfe6f5" opacity=".18"/>`;
+  return `<svg viewBox="0 0 340 300" role="img" aria-label="Folha de contato da câmera">
+  <rect width="340" height="300" fill="#0a0d16"/>
+  <text x="12" y="18" class="t-mono" font-size="8.5" font-weight="600" fill="#f3c62f">BACKUP AUTOMÁTICO · CÂMERA DIGITAL LUMEN X2</text>
+  <text x="12" y="31" class="t-mono" font-size="7.5" fill="#9ba7c9">B. Quintela · sincronizado pelo Wi-Fi do trem · 4 arquivos na noite</text>
+  ${fr(12,42,'LX2_0412.jpg','21:41',f1)}
+  ${fr(176,42,'LX2_0413.jpg','22:47',f2)}
+  ${fr(12,172,'LX2_0414.jpg','22:49',f3)}
+  ${fr(176,172,'LX2_0415.jpg','22:52',f4)}
+  </svg>`; }
+};
+
+/* =========================================================
+   CASOS
+   ========================================================= */
+const CASES = [
+{
+  id:'caso-1', num:'01', level:1, title:'O Violino das 19h', crime:'Roubo', place:'Teatro Municipal de Porto Âmbar',
+  teaser:'Um violino de 1740 some do camarim meia hora antes do concerto. A janela está aberta. Conveniente demais.',
+  brief:[
+    'Sábado, noite de gala. A solista Helena Prado vai tocar o <b>Rouxinol</b>, um violino de 1740 emprestado por um colecionador e segurado em R$ 2 milhões.',
+    'Às <b>18:30</b> ela tranca o estojo, deixa o violino no camarim 3 e sobe ao palco para a passagem de som. Às <b>19:00</b> ela volta: o estojo está aberto e vazio, e a janela do camarim, escancarada.',
+    'A produtora já decidiu que foi ladrão de fora, pela janela. A polícia quer encerrar rápido. Você foi chamado para olhar de novo.'
+  ],
+  facts:[
+    ['18:30','Helena deixa o violino no camarim 3. A porta do camarim não tranca.'],
+    ['19:00','Helena encontra o estojo vazio e a janela aberta.'],
+    ['Portas','O prédio tem duas saídas: a entrada principal, vigiada pelo porteiro, e a saída lateral da sala de ensaio, que só abre por dentro.'],
+    ['Busca','O teatro foi revistado às 19:30. O violino não está no prédio.']
+  ],
+  suspects:[
+    {id:'bruno', name:'Bruno Tavares', role:'Segundo violinista · 34 anos',
+     pic:{skin:'#d9a47a',hair:'#1c1712',style:'side',cloth:'#17181f',shirt:'#f3f3ee',bowtie:'#17181f',mouth:'smirk'},
+     motive:'Há oito anos é o eterno segundo violino. Diz a quem quiser ouvir que o Rouxinol devia estar nas mãos dele.',
+     statement:'Fiquei no palco na passagem de som, das 18:30 até a Helena sair. Não desci nem pra beber água. E esse bilhete que acharam no meu estojo é sobre o teste de segunda-feira para a primeira cadeira, nada a ver com violino roubado.'},
+    {id:'celia', name:'Célia Rocha', role:'Camareira e figurinista · 58 anos',
+     pic:{skin:'#8d5a3b',hair:'#b9bcc6',style:'bun',cloth:'#8a6fb0',glasses:'#2a2a33',mouth:'neutral'},
+     motive:'Helena a humilhou na frente do elenco na semana passada por causa de uma barra mal feita.',
+     statement:'Saí pra buscar o vestido de gala na lavanderia, que fica a uns oito minutos a pé. Peguei a chuva inteira na volta. Quando cheguei já estava a gritaria. Tenho o recibo.'},
+    {id:'otavio', name:'Otávio Lins', role:'Afinador de pianos · 51 anos',
+     pic:{skin:'#e8c2a0',hair:'#6b5a48',style:'bald',cloth:'#c99a2b',shirt:'#e9e2cf',mustache:true,mouth:'neutral'},
+     motive:'A oficina dele está com o aluguel atrasado. Conhece o valor de cada instrumento do teatro.',
+     extra:['Marca registrada','Sobretudo mostarda, que não tira nem no verão.','Maleta','Chave de afinação, diapasão e tiras de feltro para abafar cordas.'],
+     statement:'Cheguei 18:05 e fui direto pra sala de ensaio afinar o piano de cauda do segundo ato. Fiquei lá sozinho até ouvir a gritaria. Não botei o pé pra fora daquela sala, nem sabia que estava chovendo.'},
+    {id:'marina', name:'Marina Couto', role:'Produtora do concerto · 42 anos',
+     pic:{skin:'#c68863',hair:'#5a1f1f',style:'long',cloth:'#1f6f73',earrings:'#f3c62f',mouth:'frown'},
+     motive:'O seguro de R$ 2 milhões do violino está no nome da produtora dela.',
+     statement:'Fiquei no guichê da bilheteria resolvendo ingresso duplicado desde as 18:20. É óbvio o que aconteceu: alguém entrou pela janela do jardim, pegou o violino e pulou de volta. Janela aberta, caso encerrado.'}
+  ],
+  witnesses:[
+    {name:'Helena Prado', role:'Solista, dona do camarim 3', statement:'O Bruno ficou no palco comigo a passagem de som inteira, isso eu garanto, por mais que me custe. O violino estava no estojo às 18:30. Eu mesma fechei a janela antes de subir: violino antigo não pode pegar umidade.'},
+    {name:'Seu Nonato', role:'Porteiro', statement:'A dona Marina ficou no guichê do meu lado das 18:20 até a gritaria, brigando com o computador. Pela minha porta ninguém saiu carregando nada maior que um guarda-chuva. Está tudo no livro.'}
+  ],
+  clues:[
+    {id:'planta', title:'Planta do teatro', art:()=>ART.teatroPlanta(), cap:'Térreo do Teatro Municipal. Em vermelho, a saída lateral.'},
+    {id:'livro', title:'Livro da portaria', art:()=>`<div class="doc hand"><h4>Teatro Municipal · Livro da portaria · sábado</h4><table>
+      <tr><td>17:50</td><td>Helena Prado — entrou</td></tr>
+      <tr><td>17:55</td><td>Bruno Tavares — entrou</td></tr>
+      <tr><td>18:05</td><td>Otávio Lins (afinador) — entrou</td></tr>
+      <tr><td>18:10</td><td>Marina Couto — entrou</td></tr>
+      <tr><td>18:25</td><td>Célia Rocha — saiu (lavanderia)</td></tr>
+      <tr><td>18:40</td><td>começou a chover forte. Até aqui, céu limpo</td></tr>
+      <tr><td>19:02</td><td>Célia Rocha — voltou, encharcada</td></tr></table>
+      <p class="obs">Obs.: ninguém mais passou por esta porta até a polícia chegar. — Nonato</p></div>`,
+     cap:'Anotações do porteiro na entrada principal.'},
+    {id:'cabideiro', title:'Cabideiro da sala de ensaio', art:()=>ART.cabideiro(), cap:'Fotografado pela polícia dez minutos depois do alarme.'},
+    {id:'canteiro', title:'Canteiro sob a janela', art:()=>ART.canteiro(), cap:'Lado de fora do camarim 3. A terra está encharcada e fofa.'},
+    {id:'recibo', title:'Recibo da lavanderia', art:()=>`<div class="doc receipt"><h4>LAVANDERIA ESPUMA</h4><p class="c">Rua do Teatro, 310</p><hr><table>
+      <tr><td>Data</td><td>sábado</td></tr><tr><td>Hora</td><td><b>18:42</b></td></tr><tr><td>Cliente</td><td>C. ROCHA</td></tr></table><hr><table>
+      <tr><td>1x</td><td>Vestido de gala (retirada)</td></tr><tr><td></td><td>R$ 85,00 — PAGO</td></tr></table><hr><p class="c">Obrigado pela preferência!</p></div>`,
+     cap:'Entregue por Célia Rocha.'},
+    {id:'feltro', title:'Trinco da saída lateral', art:()=>ART.feltro(), cap:'A porta parecia fechada. Uma tira de feltro vermelho impedia o trinco de travar.'},
+    {id:'bilhete', title:'Bilhete amassado', art:()=>`<div class="doc hand"><h4>Achado no estojo de Bruno Tavares</h4><p style="font-size:21px;transform:rotate(-1.5deg);padding:8px 4px">Depois de hoje, a primeira cadeira é minha.<br>— B.</p></div>`,
+     cap:'Papel de pauta rasgado, letra do próprio Bruno.'}
+  ],
+  questions:[
+    {id:'q1', q:'Quem roubou o Rouxinol?', options:[['bruno','Bruno Tavares'],['celia','Célia Rocha'],['otavio','Otávio Lins'],['marina','Marina Couto']], answer:'otavio'},
+    {id:'q2', q:'Por onde o violino saiu do teatro?', options:[['janela','Pela janela do camarim 3'],['portaria','Pela entrada principal, passando pelo porteiro'],['lateral','Pela saída lateral da sala de ensaio'],['palco','Não saiu: está escondido no palco']], answer:'lateral'},
+    {id:'q3', q:'Qual pista prova que o culpado mentiu?', options:[['recibo','O recibo da lavanderia'],['bilhete','O bilhete amassado'],['canteiro','O canteiro sob a janela'],['casaco','O cabideiro da sala de ensaio']], answer:'casaco'}
+  ],
+  hints:[
+    'A janela aberta parece a rota de fuga. Olhe o canteiro logo abaixo dela: alguém pisou ali?',
+    'Compare a hora em que cada pessoa entrou no teatro com a hora em que a chuva começou.',
+    'Uma pessoa jura que não saiu do prédio. Uma peça de roupa no cabideiro diz o contrário. De quem ela é?'
+  ],
+  solution:{
+    who:'Otávio Lins, o afinador',
+    steps:[
+      '<b>A janela é encenação.</b> O canteiro embaixo dela está encharcado e sem uma pegada, com todas as flores em pé. Ninguém entrou nem pulou por ali. E Helena tinha fechado a janela: quem abriu queria que parecesse ladrão de fora.',
+      '<b>Três álibis fecham.</b> Bruno ficou no palco com a própria vítima. Marina ficou no guichê ao lado do porteiro. Célia saiu às 18:25, cinco minutos antes de o violino ficar sozinho, estava na lavanderia às 18:42 e só voltou às 19:02.',
+      '<b>O casaco entrega Otávio.</b> Ele entrou às 18:05 com céu limpo, a chuva começou às 18:40 e ele diz que não saiu da sala. Mas o sobretudo mostarda no cabideiro está pingando, com uma poça embaixo. Ele esteve lá fora depois das 18:40.',
+      '<b>A porta explica o caminho.</b> A saída lateral só abre por dentro e fica na sala onde ele estava sozinho. A tira de feltro no trinco, igual às da maleta dele, manteve a porta destravada para ele levar o violino ao carro e voltar sem passar pela portaria.'
+    ],
+    epi:'O Rouxinol estava no porta-malas de Otávio, enrolado num cobertor. O concerto começou com quarenta minutos de atraso e Bruno continuou na segunda cadeira.'
+  }
+},
+{
+  id:'caso-2', num:'02', level:2, title:'O Gabarito Vazado', crime:'Fraude', place:'Colégio Atlas',
+  teaser:'Na véspera da prova que vale uma bolsa integral, a foto do gabarito aparece à venda num grupo de alunos. A via original nunca saiu da gaveta.',
+  brief:[
+    'Sexta de manhã acontece a <b>Prova da Bolsa</b> do Colégio Atlas: quem tirar a maior nota estuda de graça até se formar. Na quinta, às <b>21:47</b>, um número desconhecido posta num grupo de alunos a foto do gabarito e oferece a versão completa por R$ 150.',
+    'A coordenadora imprimiu uma única via na quinta à tarde e trancou na gaveta. A via continua lá, com o lacre intacto. Mesmo assim, o gabarito da foto é verdadeiro.',
+    'A direção quer um nome antes de decidir se cancela a prova. Os registros eletrônicos do colégio estão todos com você.'
+  ],
+  facts:[
+    ['Arquivo','O PDF do gabarito só existe na pasta de rede do prof. Raul. Para abrir, é preciso entrar com o usuário e a senha dele.'],
+    ['Sala','A sala da coordenação tem dois computadores (PC1 e PC2) e uma impressora. A porta só abre com crachá e registra tudo.'],
+    ['Toner','O toner reserva fica no almoxarifado de TI. Só duas chaves abrem aquela porta: a do técnico e a chave mestra da inspetora.'],
+    ['Quadra','O ginásio fica no outro bloco, a quatro minutos de caminhada da coordenação.']
+  ],
+  suspects:[
+    {id:'raul', name:'Raul Meireles', role:'Professor de matemática, autor da prova · 49 anos',
+     pic:{skin:'#c99672',hair:'#8b8f9a',style:'short',cloth:'#6b4a33',shirt:'#e6dcc6',beard:true,glasses:'#22242c',mouth:'frown'},
+     motive:'Foi preterido para o cargo de coordenador este ano e vive dizendo que a Prova da Bolsa é um teatro.',
+     statement:'Saí às seis para o recital da minha filha, tem cem pais de testemunha. Antes de ir tentei imprimir a lista de presença e a impressora acusou toner vazio, então cancelei. Minha senha? Ninguém nunca me pediu.'},
+    {id:'iris', name:'Íris Sampaio', role:'Inspetora do turno da noite · 45 anos',
+     pic:{skin:'#e2b48c',hair:'#d9752a',style:'bun',cloth:'#37415f',vest:'#f3d21f',glasses:'#d8362c',mouth:'neutral'},
+     motive:'O sobrinho dela faz a prova amanhã. Ela carrega a chave mestra do colégio.',
+     extra:['Uniforme','Única funcionária que usa o colete amarelo da inspetoria.'],
+     statement:'Fiz a ronda normal. Passei na coordenação às 18:40, tudo em ordem. Às 20:15 eu estava conferindo as salas do Bloco B, do outro lado do colégio. Não cheguei nem perto da quadra hoje.'},
+    {id:'caio', name:'Caio Brandão', role:'Aluno do 3º ano, monitor da coordenação · 17 anos',
+     pic:{skin:'#b9825e',hair:'#20160f',style:'curly',cloth:'#2456c9',mouth:'neutral'},
+     motive:'É candidato à bolsa. Como monitor, o crachá dele abre a sala da coordenação.',
+     statement:'Perdi meu crachá hoje à tarde, acho que no laboratório de informática, na última aula. Quando voltei pra procurar, o Jota já tinha trancado tudo. De noite entrei pro treino com o porteiro liberando o portão. Eu vou fazer a prova, mas não preciso de cola. Olha a foto do treinador: eu sou o 7.'},
+    {id:'lucia', name:'Lúcia Farias', role:'Coordenadora pedagógica · 53 anos',
+     pic:{skin:'#a8714d',hair:'#15131a',style:'bob',cloth:'#6b2f52',earrings:'#e9ece3',mouth:'neutral'},
+     motive:'É a única com a chave da gaveta. Se a prova for cancelada, o cargo dela balança.',
+     statement:'Imprimi a via às 17:10, tranquei na gaveta e fui embora. A chave não sai do meu pescoço. Hoje cedo conferi com a diretora: a folha está lá e o lacre está inteiro.'},
+    {id:'jota', name:'Jonas "Jota" Peixoto', role:'Técnico de TI · 28 anos',
+     pic:{skin:'#d9a47a',hair:'#3a2a1c',style:'side',cloth:'#2d6b4f',mouth:'smirk'},
+     motive:'Está com três parcelas da moto atrasadas. Cuida do laboratório de informática e do sistema de crachás.',
+     statement:'Entrei na coordenação às 19:55 pra rodar uma atualização no PC1 e saí dez minutos depois. Depois fiquei sozinho na sala dos servidores até umas nove. E tem outra: aquela impressora estava sem toner desde a tarde, e toner novo só chega semana que vem. Não tinha como ninguém imprimir nada ali.'}
+  ],
+  witnesses:[
+    {name:'Diretora Amélia', role:'Direção do colégio', statement:'Conferi pessoalmente a gaveta da Lúcia: a via das 17:10 está lá. O que circulou no grupo é uma segunda impressão. Quero saber quem estava naquela sala.'}
+  ],
+  clues:[
+    {id:'foto', title:'A foto que circulou', art:()=>ART.fotoVazada(), cap:'Imagem postada no grupo às 21:47. Parte das respostas foi borrada de propósito.'},
+    {id:'grupo', title:'Mensagem no grupo', art:()=>`<div class="doc chat"><h4>3º ano · só alunos (87 participantes)</h4>
+      <div class="msg"><span class="who">Número desconhecido (chip pré-pago)</span><div class="thumb">[ foto do gabarito ]</div>Gabarito da Bolsa. Quem quiser a foto inteira, sem borrão: R$ 150 no pix. Chama no privado.<small>21:47</small></div>
+      <div class="msg"><span class="who">Duda</span>isso é real??<small>21:48</small></div>
+      <div class="msg"><span class="who">Pedro H.</span>a 01 e a 02 batem com o simulado que o Raul corrigiu, é real sim<small>21:52</small></div></div>`,
+     cap:'Captura de tela entregue por um aluno à direção.'},
+    {id:'porta', title:'Registro da porta', art:()=>`<div class="doc term"><h4>PORTA COORD-01 · LEITOR DE CRACHÁ · QUINTA</h4><table>
+      <tr><td>17:08</td><td>ENTRA</td><td>L. FARIAS · coordenação</td></tr>
+      <tr><td>17:31</td><td>SAI</td><td>L. FARIAS</td></tr>
+      <tr><td>17:40</td><td>ENTRA</td><td>R. MEIRELES · professor</td></tr>
+      <tr><td>17:58</td><td>SAI</td><td>R. MEIRELES</td></tr>
+      <tr><td>18:40</td><td>ENTRA</td><td>I. SAMPAIO · inspetoria</td></tr>
+      <tr><td>18:44</td><td>SAI</td><td>I. SAMPAIO</td></tr>
+      <tr><td>19:55</td><td>ENTRA</td><td>J. PEIXOTO · TI</td></tr>
+      <tr><td>20:05</td><td>SAI</td><td>J. PEIXOTO</td></tr>
+      <tr><td>20:11</td><td>ENTRA</td><td>C. BRANDÃO · aluno-monitor</td></tr>
+      <tr><td>20:19</td><td>SAI</td><td>C. BRANDÃO</td></tr>
+      <tr><td>--:--</td><td colspan="2">sem outros registros até sexta 06:30</td></tr></table></div>`,
+     cap:'O leitor registra o crachá que foi passado, não o rosto de quem passou.'},
+    {id:'impressora', title:'Registro da impressora', art:()=>`<div class="doc term"><h4>COORD-IMP01 · FILA DE IMPRESSÃO · QUINTA</h4><table>
+      <tr><td>17:10</td><td>#212</td><td>lfarias @PC1 · 1 pág · OK</td></tr>
+      <tr><td>17:52</td><td>#213</td><td>rmeireles @PC2 · 30 pág · ERRO toner vazio (0 impressas)</td></tr>
+      <tr><td>17:53</td><td>#213</td><td>cancelado pelo usuário</td></tr>
+      <tr><td>20:12</td><td>EVENTO</td><td>toner substituído</td></tr>
+      <tr><td>20:13</td><td>LOGIN</td><td>rmeireles @PC2</td></tr>
+      <tr><td>20:14</td><td>#215</td><td>rmeireles @PC2 · 1 pág · OK · gabarito_bolsa_FINAL.pdf</td></tr>
+      <tr><td>20:17</td><td>LOGOUT</td><td>rmeireles @PC2</td></tr></table></div>`,
+     cap:'Exportado do servidor de impressão pela direção.'},
+    {id:'catraca', title:'Catraca do portão', art:()=>`<div class="doc term"><h4>PORTÃO PRINCIPAL · CATRACA · QUINTA</h4><table>
+      <tr><td>12:58</td><td>ENTRA</td><td>J. PEIXOTO</td></tr>
+      <tr><td>13:05</td><td>ENTRA</td><td>I. SAMPAIO</td></tr>
+      <tr><td>16:02</td><td>SAI</td><td>C. BRANDÃO · liberação manual (sem crachá)</td></tr>
+      <tr><td>17:33</td><td>SAI</td><td>L. FARIAS</td></tr>
+      <tr><td>18:02</td><td>SAI</td><td>R. MEIRELES</td></tr>
+      <tr><td>19:48</td><td>ENTRA</td><td>C. BRANDÃO · liberação manual (sem crachá)</td></tr>
+      <tr><td>21:04</td><td>SAI</td><td>C. BRANDÃO · liberação manual (sem crachá)</td></tr>
+      <tr><td>21:10</td><td>SAI</td><td>J. PEIXOTO</td></tr>
+      <tr><td>22:01</td><td>SAI</td><td>I. SAMPAIO</td></tr></table></div>`,
+     cap:'Só os registros das cinco pessoas investigadas. Liberação manual é o porteiro abrindo para quem está sem crachá.'},
+    {id:'futsal', title:'Foto do treino', art:()=>ART.futsal(), cap:'Publicada pelo treinador no perfil do time. O placar eletrônico do ginásio mostra a hora.'},
+    {id:'mesa', title:'Mesa do prof. Raul', art:()=>ART.mesaRaul(), cap:'A direção levantou o teclado do PC2 e achou isto colado embaixo.'},
+    {id:'achados', title:'Achados e perdidos', art:()=>`<div class="doc hand"><h4>Inspetoria · Achados e perdidos · quinta</h4><table>
+      <tr><td>10:20</td><td>garrafa azul (pátio)</td></tr>
+      <tr><td>13:40</td><td>casaco tam. P (sala 12)</td></tr>
+      <tr><td>15:15</td><td>estojo de lápis (biblioteca)</td></tr></table>
+      <p class="obs">Nenhum crachá entregue hoje. Laboratório de informática fechado e trancado às 16:00 pelo técnico.</p></div>`,
+     cap:'Caderno da inspetoria.'}
+  ],
+  questions:[
+    {id:'q1', q:'Quem imprimiu e vazou o gabarito?', options:[['raul','Raul Meireles'],['iris','Íris Sampaio'],['caio','Caio Brandão'],['lucia','Lúcia Farias'],['jota','Jonas "Jota" Peixoto']], answer:'jota'},
+    {id:'q2', q:'Uma pessoa inocente mentiu no depoimento. Quem?', options:[['raul','Raul Meireles'],['iris','Íris Sampaio'],['caio','Caio Brandão'],['lucia','Lúcia Farias'],['jota','Jonas "Jota" Peixoto']], answer:'iris'},
+    {id:'q3', q:'Como o culpado tentou jogar a culpa em outras pessoas?', options:[['gaveta','Copiou a chave da gaveta da coordenadora'],['cracha','Usou o crachá perdido de um e o login de outro'],['celular','Mandou a mensagem do celular da inspetora'],['log','Apagou linhas do registro da impressora']], answer:'cracha'}
+  ],
+  hints:[
+    'A via da gaveta nunca saiu de lá. Leia o rodapé da folha na foto vazada: quando e de onde ela foi impressa?',
+    'O crachá que abriu a porta às 20:11 é do Caio. Onde o Caio estava às 20:15? E quem mais aparece naquela mesma foto?',
+    'Às 17:52 a impressora não tinha toner. Às 20:14 imprimiu. Alguém trocou o toner às 20:12. Quem garantiu que isso era impossível, e quem tem a chave de onde o toner fica?'
+  ],
+  solution:{
+    who:'Jonas "Jota" Peixoto, o técnico de TI',
+    steps:[
+      '<b>A folha vazada é uma segunda impressão.</b> O rodapé diz job #215, 20:14, usuário rmeireles no PC2. Quem vazou estava na coordenação entre 20:11 e 20:19 e sabia a senha do Raul, que ficava num bilhete embaixo do teclado.',
+      '<b>Raul e Lúcia estavam fora do colégio.</b> A catraca mostra Lúcia saindo às 17:33 e Raul às 18:02, sem voltar.',
+      '<b>O crachá das 20:11 é do Caio, mas não era o Caio.</b> Ele saiu às 16:02 e voltou às 19:48 por liberação manual, já sem crachá. Às 20:15 está na foto do treino, camisa 7, a quatro minutos dali. Alguém achou o crachá e usou.',
+      '<b>A mesma foto livra a Íris, e mostra que ela mentiu.</b> A figura de colete amarelo da inspetoria na beira da quadra às 20:15 é ela, vendo o sobrinho jogar em vez de fazer a ronda do Bloco B. Mentiu para não levar advertência, mas não podia estar na coordenação.',
+      '<b>Sobra o Jota, e as provas apontam para ele.</b> O toner foi trocado às 20:12 e só a chave dele e a chave mestra da Íris abrem o almoxarifado. Ele disse que não havia toner até a semana que vem: mentira. O crachá sumiu no laboratório que ele mesmo trancou e nunca chegou aos achados e perdidos. E a folha tem uma digital de toner no canto.'
+    ],
+    epi:'Às 19:55 Jota entrou com o próprio crachá, viu a senha e a impressora parada. Buscou o toner, voltou às 20:11 com o crachá do Caio, imprimiu como Raul e saiu limpo no registro. O chip pré-pago estava na mochila dele. A prova foi refeita no sábado.'
+  }
+},
+{
+  id:'caso-3', num:'03', level:3, title:'A Esmeralda do Expresso', crime:'Troca', place:'Expresso Serra Azul, trem noturno',
+  teaser:'Uma esmeralda de 4 milhões vira vidro de garrafa dentro de um vagão trancado, num trem em movimento. Todo mundo tem certeza de quando foi. Todo mundo está errado.',
+  brief:[
+    'A <b>Esmeralda Jaguar</b>, arrematada em leilão por R$ 4 milhões, viaja de Porto Âmbar a Vila do Cedro no vagão de bagagens do Expresso Serra Azul, dentro de uma redoma de vidro trancada.',
+    'Às <b>22:00</b> o portador, Sr. Albano, confere a pedra na lupa: verdadeira. Às <b>23:30</b> ele confere de novo: no lugar dela há um pedaço de vidro verde lapidado.',
+    'Entre uma coisa e outra, o trem atravessou o Túnel do Vigário, onde as luzes sempre apagam por quatro minutos. Passageiros e tripulação repetem a mesma frase: foi no túnel. A polícia espera na estação de chegada. Você tem até lá.'
+  ],
+  facts:[
+    ['22:00','Albano e o chefe de trem conferem a pedra e trancam o vagão D.'],
+    ['23:30','Albano encontra a imitação dentro da redoma, que está trancada e sem arranhões.'],
+    ['23:40','Todos são revistados, com cabines, bagagens e vagão D. A esmeralda não aparece.'],
+    ['Trem','Nenhuma parada depois de Pedra Lisa. Vagões climatizados, janelas lacradas: nada sai do trem em movimento.']
+  ],
+  suspects:[
+    {id:'veronica', name:'Verônica Alcântara', role:'Colecionadora · 67 anos · cabine 2',
+     pic:{skin:'#e6c3a5',hair:'#d9dbe2',style:'bun',cloth:'#6e1f33',pearls:true,brow:'#8f929c',mouth:'frown'},
+     motive:'Perdeu o leilão da Esmeralda Jaguar por um único lance e não se conforma.',
+     statement:'Perdi o leilão dessa pedra por um lance, e daí? Jantei, paguei a conta e me tranquei na cabine 2 com meu livro. No túnel eu estava sozinha. Não troquei uma palavra com nenhum passageiro a viagem inteira.'},
+    {id:'emilio', name:'Emílio Sarmento', role:'Joalheiro · 59 anos · cabine 3',
+     pic:{skin:'#c99672',hair:'#3b3b40',style:'bald',cloth:'#565b69',shirt:'#e9ece3',goatee:true,glasses:'#b9902d',mouth:'neutral'},
+     motive:'É um dos poucos na região capazes de lapidar uma imitação. Viaja com lupa e pinças.',
+     statement:'Jantei até as onze e fui dormir na cabine 3. No túnel eu estava sozinho, dormindo. Não conheço nenhum dos outros passageiros. E aquela imitação é vidro de garrafa com lapidação de amador. Eu teria vergonha de assinar aquilo.'},
+    {id:'tico', name:'Tico Nogueira', role:'Garçom do vagão-restaurante · 24 anos',
+     pic:{skin:'#a8714d',hair:'#15131a',style:'short',cloth:'#f1f1ec',bowtie:'#15131a',mouth:'smirk'},
+     motive:'Pediu adiantamento de salário duas vezes este mês. Foi visto esfregando uma mancha verde no pano.',
+     statement:'Não saí do restaurante a noite inteira, as comandas mostram. No túnel acendi uma vela e fiquei com a jornalista, que tomava café. A mancha verde é licor de menta: derrubei o da madame da mesa 2.'},
+    {id:'barbara', name:'Bárbara Quintela', role:'Jornalista · 36 anos · cabine 4',
+     pic:{skin:'#e2b48c',hair:'#7a3b22',style:'bob',cloth:'#5c6b3a',clip:true,mouth:'smirk'},
+     motive:'Cobriu o leilão para o Diário de Porto Âmbar e conhece a pedra em detalhes. Pediu para viajar neste trem.',
+     extra:['Equipamento','Câmera digital Lumen X2, que envia cada foto sozinha para o servidor do jornal.'],
+     statement:'Vim fazer a matéria do transporte. Pedi ao chefe de trem para fotografar a pedra. Tirei uma foto só, às 22:52, com ele do meu lado, e já entreguei à polícia: a esmeralda aparece lá, intacta. Depois fui tomar café e estava no restaurante, com o garçom, quando o túnel apagou tudo. Quem trocou a pedra trocou no escuro.'},
+    {id:'samuca', name:'Samuel "Samuca" Diniz', role:'Chefe de trem · 48 anos',
+     pic:{skin:'#c99672',hair:'#1b1712',style:'short',cloth:'#1b2748',cap:'#1b2748',mustache:true,mouth:'neutral'},
+     motive:'Tem a única chave do vagão D e a chave reserva da redoma. Se a pedra some, a suspeita cai nele.',
+     statement:'A jornalista pediu para fotografar a pedra e eu achei que não tinha mal. Abri o vagão às 22:47, fiquei do lado dela o tempo todo, ela fotografou e eu tranquei tudo às 22:55. Quando saímos a pedra estava lá, verdinha. No túnel eu estava na locomotiva, como manda a regra.'}
+  ],
+  witnesses:[
+    {name:'Sr. Albano Reis', role:'Portador da esmeralda · cabine 1', statement:'Às dez conferi a pedra na lupa, com o chefe de trem ao lado: era a verdadeira. Trancamos o vagão. Tomei meu remédio de enjoo e apaguei na cabine. Acordei 23:25 e fui olhar: vidro. A redoma só abre com chave e existem duas, a minha, que dormiu no meu bolso, e a reserva do chefe de trem.'},
+    {name:'Dona Olga', role:'Passageira do vagão C, 81 anos', statement:'Sento colada na porta do vagão de bagagens e não durmo em trem. Das dez até Pedra Lisa ninguém entrou ali, nem na parada. Depois da parada entraram o chefe de trem e a moça da câmera, juntos, e saíram juntos uns minutos depois. No túnel ficou um breu, mas a porta fica encostada no meu braço e ninguém passou por mim.'},
+    {name:'Seu Lázaro', role:'Maquinista', statement:'O Samuca entrou na cabine da locomotiva no sinal das onze e só saiu depois do túnel. Sempre é assim nesse trecho. A chave do vagão D estava no cinto dele, eu ouvia o molho bater.'}
+  ],
+  clues:[
+    {id:'trem', title:'Composição do trem', art:()=>ART.trem(), cap:'Vista de cima. Para chegar ao vagão D é preciso atravessar o vagão C.'},
+    {id:'horario', title:'Roteiro de bordo', art:()=>`<div class="doc term"><h4>EXPRESSO SERRA AZUL · ROTEIRO DO CHEFE DE TREM</h4><table>
+      <tr><td>21:30</td><td>Partida de Porto Âmbar</td></tr>
+      <tr><td>22:00</td><td>Conferência da carga de valor · trancar vagão D</td></tr>
+      <tr><td>22:40</td><td>Parada em Pedra Lisa · chefe de trem na plataforma</td></tr>
+      <tr><td>22:45</td><td>Partida de Pedra Lisa</td></tr>
+      <tr><td>22:50</td><td>Ponte do Rio Fundo · chefe de trem confere o sinal pela janela da porta mais próxima</td></tr>
+      <tr><td>23:00</td><td>Chefe de trem sobe à locomotiva</td></tr>
+      <tr><td>23:05</td><td>Túnel do Vigário · luzes apagam (4 min)</td></tr>
+      <tr><td>00:15</td><td>Chegada a Vila do Cedro</td></tr></table></div>`,
+     cap:'Folha fixada na cabine do chefe de trem. A viagem seguiu o roteiro no minuto.'},
+    {id:'cert', title:'Certificado da pedra', art:()=>ART.certificado(), cap:'Documento do leilão, com o desenho da Esmeralda Jaguar verdadeira.'},
+    {id:'falsa', title:'A pedra das 23:30', art:()=>ART.pedraFalsa(), cap:'O que estava dentro da redoma quando Albano conferiu pela segunda vez.'},
+    {id:'contato', title:'Arquivos da câmera', art:()=>ART.contato(), cap:'A redação do jornal enviou tudo que a câmera de Bárbara sincronizou naquela noite.'},
+    {id:'comandas', title:'Comandas do restaurante', art:()=>`<div class="doc receipt"><h4>VAGÃO-RESTAURANTE</h4><p class="c">atendente: Tico N.</p><hr>
+      <p><b>MESA 2 · cabine 2</b></p><table><tr><td>21:50</td><td>jantar completo</td></tr><tr><td>22:20</td><td>licor de menta (derramado, reposto)</td></tr><tr><td>22:35</td><td>conta paga</td></tr></table><hr>
+      <p><b>MESA 4 · cabine 3</b></p><table><tr><td>22:12</td><td>sopa do dia</td></tr><tr><td>22:31</td><td>taça de vinho</td></tr><tr><td>22:48</td><td>sobremesa</td></tr><tr><td>23:02</td><td>conta paga</td></tr></table><hr>
+      <p><b>MESA 1 · cabine 4</b></p><table><tr><td>22:58</td><td>café coado</td></tr><tr><td>23:15</td><td>conta paga</td></tr></table></div>`,
+     cap:'Todas as comandas da noite.'},
+    {id:'bilhete', title:'Bilhete cifrado', art:()=>`<div class="doc hand"><h4>Achado no lixo do vagão-restaurante</h4><span class="scrib">A = D</span>
+      <p class="cipher">FDELQH GRLV QR WXQHO.<br>OHYH R GLQKHLUR.<br>— Y.</p></div>`,
+     cap:'Guardanapo dobrado em quatro, escrito a caneta-tinteiro.'},
+    {id:'revista', title:'Lista da revista', art:()=>`<div class="doc hand"><h4>Revista das 23:40 · feita por A. Reis e S. Diniz</h4><table>
+      <tr><td>Verônica</td><td>bolsa, livro, envelope com R$ 18.000 em notas</td></tr>
+      <tr><td>Emílio</td><td>lupa de joalheiro, pinças, pulseira de safiras (feminina), carteira</td></tr>
+      <tr><td>Tico</td><td>bloco de comandas, saca-rolhas, pano manchado de verde (cheiro de menta)</td></tr>
+      <tr><td>Bárbara</td><td>câmera Lumen X2, 2 lentes, caderno, 4 potes de filme 35 mm (lacrados, não abertos), grampos</td></tr>
+      <tr><td>Samuca</td><td>molho de chaves, lanterna, relógio de bolso, alicate de picotar</td></tr></table>
+      <p class="obs">Cabines, bagagens e vagão D revistados. Nada.</p></div>`,
+     cap:'O que cada um carregava.'}
+  ],
+  questions:[
+    {id:'q1', q:'Quem trocou a esmeralda?', options:[['veronica','Verônica Alcântara'],['emilio','Emílio Sarmento'],['tico','Tico Nogueira'],['barbara','Bárbara Quintela'],['samuca','Samuel "Samuca" Diniz']], answer:'barbara'},
+    {id:'q2', q:'Quando a troca aconteceu?', options:[['antes','Antes das 22:00, ainda na estação'],['parada','Na parada de Pedra Lisa (22:40 a 22:45)'],['fotos','Entre 22:49 e 22:52'],['tunel','No Túnel do Vigário (23:05 a 23:09)'],['depois','Entre o túnel e as 23:30']], answer:'fotos'},
+    {id:'q3', q:'Onde está a esmeralda verdadeira?', options:[['janela','Foi passada pela janela na parada de Pedra Lisa'],['lanterna','Dentro da lanterna do chefe de trem'],['maleta','Entre as ferramentas do joalheiro'],['filme','Num dos potes de filme da jornalista'],['pano','Enrolada no pano do garçom']], answer:'filme'}
+  ],
+  hints:[
+    'Todo mundo jura que foi no túnel. Mas durante o túnel o vagão D estava trancado e a única chave estava na locomotiva. Desconfie do horário antes de desconfiar das pessoas.',
+    'Compare o desenho do certificado com cada arquivo da câmera. Conte os lados da pedra em cada foto.',
+    'A câmera da jornalista é digital. Releia a lista da revista: o que ela carrega que uma câmera digital não usa?',
+    'Sobre o bilhete: cada letra foi empurrada três casas para a frente no alfabeto. Volte três e descubra por que dois suspeitos mentiram sobre o túnel.'
+  ],
+  solution:{
+    who:'Bárbara Quintela, a jornalista',
+    steps:[
+      '<b>O túnel é um álibi coletivo, não a cena do crime.</b> No escuro o vagão D estava trancado, a chave estava no cinto do Samuca na locomotiva e Dona Olga não sentiu ninguém passar. Das 22:00 até a parada ninguém entrou. O vagão só foi aberto uma vez: das 22:47 às 22:55, para as fotos.',
+      '<b>As fotos mostram a troca.</b> No certificado a Esmeralda Jaguar tem oito lados. No arquivo das 22:49, sob a redoma, a pedra tem oito lados. No arquivo das 22:52, sem a redoma, tem seis, igual ao vidro apreendido. A troca aconteceu nesses três minutos.',
+      '<b>Bárbara mentiu duas vezes.</b> Disse que tirou uma foto só e que a das 22:52 mostra a pedra intacta. A câmera mandou duas para o jornal, e a que ela entregou já mostra a falsa. Quem fotografou as duas pedras de perto viu a troca, porque foi ela quem fez.',
+      '<b>Samuca deu a brecha.</b> A foto das 22:52 mostra a redoma levantada: ele abriu com a chave reserva para ela fugir do reflexo e omitiu isso. Às 22:50, na Ponte do Rio Fundo, o roteiro manda conferir o sinal pela janela. Ele deu as costas com a redoma aberta. Negligente e calado por medo, mas não ladrão.',
+      '<b>A pedra está no filme.</b> Nada sai de um trem lacrado e a revista não achou nada. Uma câmera digital não usa filme, mas Bárbara carrega quatro potes de 35 mm, os únicos objetos que ninguém abriu.',
+      '<b>E os dois sem álibi no túnel?</b> O bilhete, voltando três letras, diz: CABINE DOIS NO TUNEL. LEVE O DINHEIRO. — V. Verônica, falida em segredo, vendeu a pulseira de safiras a Emílio no escuro. Por isso ela tem R$ 18.000 em notas, ele tem uma pulseira feminina e os dois juraram que não se conheciam.'
+    ],
+    epi:'Na plataforma de Vila do Cedro, o delegado abriu o terceiro pote de filme. A esmeralda rolou para a palma da mão dele. Bárbara tinha escrito seis matérias sobre a pedra, e a sétima seria sobre o roubo misterioso no túnel.'
+  }
+}
+];
+
+/* ---------------- CASO 4 ---------------- */
+Object.assign(ART,{
+museuMapa(){ return `<svg viewBox="0 0 360 286" role="img" aria-label="Mapa do Museu Farol">
+  <rect width="360" height="286" fill="#16203a"/>
+  <rect x="10" y="196" width="340" height="80" fill="#2a3040"/>
+  <text x="180" y="210" class="t-mono" font-size="7.5" fill="#c9d2ea" text-anchor="middle">PÁTIO INTERNO (descoberto)</text>
+  <g fill="#e9ece3" stroke="#1c2135" stroke-width="2">
+    <rect x="20" y="20" width="80" height="62"/><rect x="100" y="20" width="80" height="62"/><rect x="180" y="20" width="80" height="62"/><rect x="260" y="20" width="80" height="62"/>
+    <rect x="20" y="82" width="320" height="22"/>
+    <rect x="20" y="104" width="72" height="86"/><rect x="92" y="104" width="78" height="86"/><rect x="170" y="104" width="44" height="86"/><rect x="214" y="104" width="44" height="86"/><rect x="258" y="104" width="34" height="86"/><rect x="292" y="104" width="48" height="86"/>
+    <rect x="252" y="226" width="50" height="34"/><rect x="24" y="226" width="50" height="34"/>
+  </g>
+  <g class="t-disp" fill="#1c2135" text-anchor="middle" font-size="12"><text x="60" y="50">SALA 1</text><text x="140" y="50">SALA 2</text><text x="220" y="46">SALA 3</text></g>
+  <g class="t-mono" fill="#1c2135" text-anchor="middle" font-size="7">
+    <text x="300" y="46" font-weight="600">LABORATÓRIO</text><text x="300" y="56">de restauro</text>
+    <text x="180" y="96">CORREDOR NORTE</text>
+    <text x="56" y="140" font-weight="600">SALA DE</text><text x="56" y="150" font-weight="600">SEGURANÇA</text><text x="56" y="161" font-size="6">monitores</text>
+    <text x="131" y="146" font-weight="600">HALL</text>
+    <text x="192" y="146">SALA 4</text><text x="236" y="146">SALA 5</text>
+    <text x="275" y="140" font-size="6">DEPÓS.</text><text x="275" y="149" font-size="6">LIMPEZA</text>
+    <text x="316" y="140" font-weight="600">DOCA</text><text x="316" y="150" font-size="6">de carga</text>
+    <text x="277" y="241" font-weight="600" font-size="6.5">CASA DE</text><text x="277" y="250" font-weight="600" font-size="6.5">FORÇA</text>
+    <text x="49" y="246" font-weight="600">GUARITA</text>
+  </g>
+  <rect x="196" y="18" width="48" height="6" fill="#f3c62f" stroke="#1c2135"/><text x="220" y="62" class="t-mono" font-size="6.5" fill="#1c2135" text-anchor="middle">A Travessia</text>
+  <g fill="#e5483d"><rect x="292" y="80" width="14" height="5"/><rect x="40" y="101" width="14" height="5"/><rect x="266" y="101" width="14" height="5"/><rect x="304" y="101" width="14" height="5"/><rect x="270" y="224" width="14" height="5"/></g>
+  <rect x="306" y="188" width="24" height="5" fill="#f3c62f"/><text x="318" y="204" class="t-mono" font-size="6" fill="#f3c62f" text-anchor="middle">portão da doca</text>
+  <rect x="322" y="214" width="22" height="40" rx="3" fill="#d9dde3" stroke="#1c2135"/><text x="333" y="238" class="t-mono" font-size="5.5" fill="#1c2135" text-anchor="middle" transform="rotate(-90 333 236)">VAN</text>
+  <rect x="120" y="188" width="22" height="5" fill="#8d949c"/><text x="131" y="204" class="t-mono" font-size="6" fill="#c9d2ea" text-anchor="middle">porta do hall</text>
+  <rect x="80" y="262" width="60" height="5" fill="#f3c62f"/><text x="150" y="268" class="t-mono" font-size="6.5" fill="#f3c62f">cancela (carros) e portão de pedestres</text>
+  <text x="180" y="282" class="t-mono" font-size="6.5" fill="#9ba7c9" text-anchor="middle">Vermelho: portas com leitor de crachá. As salas de exposição não têm porta.</text>
+  </svg>`; },
+travessia(){ return `<svg viewBox="0 0 300 200" role="img" aria-label="Foto do quadro A Travessia"><rect width="300" height="200" fill="#d9dde3"/><rect x="50" y="24" width="200" height="140" fill="#3a2a1c"/><rect x="60" y="34" width="180" height="120" fill="#27456b"/><rect x="60" y="106" width="180" height="48" fill="#1b2f4a"/><circle cx="200" cy="62" r="13" fill="#f3e7b0"/><path d="M96 112h72l-10 16h-52z" fill="#7a2338"/><path d="M130 112V66l30 40z" fill="#e9ece3"/><path d="M60 128q30-8 60 0t60 0t60 0" fill="none" stroke="#5f86b5" stroke-width="2"/><rect x="232" y="88" width="14" height="20" rx="2" fill="#b9902d" stroke="#1c2135"/><circle cx="239" cy="98" r="2.5" fill="#1c2135"/><rect x="118" y="172" width="64" height="14" fill="#fff" stroke="#55606e"/><text x="150" y="182" class="t-mono" font-size="6" fill="#1c2135" text-anchor="middle">A Travessia, 1931</text></svg>`; }
+});
+CASES.push({
+  id:'caso-4', num:'04', level:3, title:'Apagão no Museu Farol', crime:'Roubo com cúmplice', place:'Museu Farol, turno da noite',
+  teaser:'A luz cai por uma hora e um quadro some. Ninguém vai te contar nada: você recebe um e-mail com prints do grupo, registros e documentos. Ache o culpado e o cúmplice.',
+  peopleLabel:'6 pessoas no caso · sem depoimentos', fichaLabel:'O que se sabe',
+  brief:[
+    'Neste caso você não interroga ninguém. Tudo que existe é o que ficou registrado naquela madrugada: o grupo de WhatsApp do turno, os leitores de crachá, os bastões de ronda, o livro da guarita e alguns papéis.',
+    'Repare na diferença entre o que as pessoas <b>escreveram no grupo</b> e o que os <b>registros automáticos</b> mostram. Alguém pode mentir no grupo sem ter roubado nada. Aqui são dois envolvidos: quem tirou o quadro da parede e quem ajudou.'
+  ],
+  email:{from:'Rubens Catão · Chefe de Segurança, Museu Farol', to:'Agência Lupa', date:'quinta, 07:12', subject:'URGENTE: sumiço de "A Travessia" durante queda de energia',
+    body:[
+      'Detetive, preciso de ajuda antes que isso vire notícia.',
+      'Esta madrugada a energia do museu caiu das <b>03:00 às 04:00</b>. Nesse intervalo as câmeras e os sensores das salas ficaram fora do ar. Às 04:05, com a luz de volta, o líder do turno encontrou a Sala 3 sem o quadro <b>A Travessia</b> (1931). Levaram tela e moldura. A trava antifurto foi aberta sem arrombamento.',
+      'O que continuou funcionando, porque tem bateria: os <b>leitores de crachá</b> das portas internas e os <b>bastões de ronda</b> dos vigilantes. A guarita também anotou tudo, e a câmera da prefeitura na rua mostra a vigilante Soraia no posto a noite inteira.',
+      'A polícia e eu revistamos o prédio inteiro das 05:00 às 06:30, laboratório e depósitos incluídos. O quadro não está aqui dentro. Ninguém saiu a pé.',
+      'Mando em anexo tudo que consegui juntar. Só seis pessoas tinham crachá ativo esta noite, e uma delas sou eu. Não confie em ninguém, nem em mim: confie nos registros.'
+    ],
+    attach:['prints do grupo "Turno da Noite" (2)','mapa do museu','registro dos leitores de crachá','bastões de ronda','livro da guarita','ordem de serviço da manutenção','laudo da concessionária','controle de chaves','post do museu']},
+  facts:[
+    ['02:30','Última ronda antes do apagão: quadro na Sala 3.'],
+    ['03:00','Cai a energia do prédio inteiro.'],
+    ['04:00','Energia volta. Às 04:05 o quadro não está mais lá.'],
+    ['Saídas','Só existem a cancela de carros e o portão de pedestres, os dois ao lado da guarita.']
+  ],
+  suspects:[
+    {id:'rubens', name:'Rubens Catão', role:'Chefe de segurança · 52 anos',
+     pic:{skin:'#c99672',hair:'#3b3b40',style:'side',cloth:'#22283a',shirt:'#e9ece3',mustache:true,mouth:'frown'},
+     motive:'Autor do e-mail. Não estava de plantão: dormia em casa, segundo ele. Responde pela segurança do acervo.'},
+    {id:'valdir', name:'Valdir Pacheco', role:'Vigilante líder do turno · 47 anos',
+     pic:{skin:'#8d5a3b',hair:'#15131a',style:'short',cloth:'#1b2748',cap:'#1b2748',mouth:'neutral'},
+     motive:'Carrega o bastão de ronda 1 e a chave-mestra das salas. Foi quem deu pela falta do quadro.'},
+    {id:'teteu', name:'Mateus "Teteu" Ferraz', role:'Vigilante, três meses de casa · 23 anos',
+     pic:{skin:'#e2b48c',hair:'#7a3b22',style:'curly',cloth:'#1b2748',mouth:'smirk'},
+     motive:'Carrega o bastão de ronda 2. Fez a ronda sozinho, de lanterna, durante o apagão.'},
+    {id:'gloria', name:'Glória Antunes', role:'Restauradora-chefe · 49 anos',
+     pic:{skin:'#c68863',hair:'#2a1c14',style:'bun',cloth:'#e9ece3',glasses:'#7a2338',mouth:'neutral'},
+     motive:'Quinze anos de museu. Restaurou A Travessia nos últimos quatro meses. Tinha autorização para trabalhar à noite no laboratório.'},
+    {id:'helio', name:'Hélio Barros', role:'Eletricista de plantão · 41 anos',
+     pic:{skin:'#d9a47a',hair:'#1c1712',style:'short',cloth:'#c9662b',beard:true,mouth:'neutral'},
+     motive:'Responsável pela casa de força e pela van da manutenção. Tem a chave do portão da doca.'},
+    {id:'edna', name:'Edna Moura', role:'Limpeza noturna · 58 anos',
+     pic:{skin:'#a8714d',hair:'#b9bcc6',style:'bob',cloth:'#2d6b4f',mouth:'neutral'},
+     motive:'Circula por todas as salas com um carrinho grande de limpeza. O lixo só sai pela doca às 05:30.'}
+  ],
+  witnesses:[
+    {name:'Soraia Lins', role:'Vigilante da guarita · fora de suspeita', statement:'Não saiu do posto: a câmera da prefeitura confirma. É ela quem escreve o livro da guarita.'}
+  ],
+  clues:[
+    {id:'grupo1', title:'Grupo do turno: antes do apagão', art:()=>`<div class="doc chat"><h4>Turno da Noite 🌙 · 6 participantes</h4>
+      <div class="msg"><span class="who">Rubens (chefe)</span>Boa noite, turno. A Travessia voltou pra Sala 3 hoje. Atenção redobrada. Qualquer coisa me liguem, tô em casa.<small>22:04</small></div>
+      <div class="msg"><span class="who">Hélio manutenção</span>Glorinha, a tia mandou avisar que domingo tem almoço lá<small>22:10</small></div>
+      <div class="msg"><span class="who">Glória restauro</span>Hélio, isso é no privado 🙄<small>22:11</small></div>
+      <div class="msg"><span class="who">Edna</span>Glória, fiquei sabendo do aviso prévio. Sinto muito, viu. 15 anos de casa<small>22:30</small></div>
+      <div class="msg"><span class="who">Glória restauro</span>Pois é. Vão terceirizar o restauro em dezembro. Depois a gente fala.<small>22:31</small></div>
+      <div class="msg"><span class="who">Valdir líder</span>Ronda das 02:30 feita. Tudo ok, quadro na 3.<small>02:32</small></div>
+      <div class="msg del"><span class="who">Hélio manutenção</span>🚫 Mensagem apagada<small>02:55</small></div>
+      <div class="msg"><span class="who">Edna</span>ué Hélio, apagou pq? só deu pra ler "tô indo pra casa de f"<small>02:56</small></div></div>`,
+     cap:'Print 1 de 2, tirado do celular do Valdir.'},
+    {id:'grupo2', title:'Grupo do turno: durante o apagão', art:()=>`<div class="doc chat"><h4>Turno da Noite 🌙 · 6 participantes</h4>
+      <div class="msg"><span class="who">Teteu</span>CAIU A LUZ. geral.<small>03:01</small></div>
+      <div class="msg"><span class="who">Edna</span>Tô no depósito de limpeza, não enxergo nada. Vou ficar aqui até voltar.<small>03:02</small></div>
+      <div class="msg"><span class="who">Valdir líder</span>Chamei o Hélio. Vou pra sala de segurança tentar subir as câmeras na bateria. Teteu, segue a ronda de lanterna.<small>03:05</small></div>
+      <div class="msg"><span class="who">Hélio manutenção</span>Recebi o chamado agora. Indo ver a casa de força.<small>03:07</small></div>
+      <div class="msg"><span class="who">Teteu</span>Passei na 3 agora. Quadro na parede, tudo ok. Indo pro hall e ala sul.<small>03:13</small></div>
+      <div class="msg"><span class="who">Hélio manutenção</span>Disjuntor geral queimou. Não tem reserva aqui. Vou buscar um no almoxarifado da Rua do Porto com a van, uns 20 min.<small>03:26</small></div>
+      <div class="msg"><span class="who">Valdir líder</span>Blz. Sigo na sala de segurança, não saí daqui desde as 3:05. Nada de câmera ainda.<small>03:35</small></div>
+      <div class="msg"><span class="who">Glória restauro</span>Gente, tô trancada no laboratório desde as 22h, não saí nem pra beber água. Avisem quando a luz voltar 🙏<small>03:41</small></div>
+      <div class="msg"><span class="who">Teteu</span>VOLTOU<small>04:00</small></div>
+      <div class="msg"><span class="who">Valdir líder</span>ATENÇÃO. Fiz a ronda agora. A TRAVESSIA NÃO ESTÁ NA SALA 3. Levaram com moldura e tudo. Trava aberta sem arrombar. Ligando pro Rubens.<small>04:06</small></div>
+      <div class="msg"><span class="who">Glória restauro</span>Como assim??<small>04:08</small></div></div>`,
+     cap:'Print 2 de 2. É o que cada um disse aos colegas, não o que os registros mostram.'},
+    {id:'mapa', title:'Mapa do museu', art:()=>ART.museuMapa(), cap:'Térreo e pátio. A casa de força fica no pátio, separada do prédio.'},
+    {id:'crachas', title:'Leitores de crachá', art:()=>`<div class="doc term"><h4>PORTAS INTERNAS · LEITORES COM BATERIA · MADRUGADA DE QUINTA</h4><table>
+      <tr><td colspan="3" class="hl">LABORATÓRIO</td></tr>
+      <tr><td>22:02</td><td>ENTRA</td><td>G. ANTUNES</td></tr><tr><td>03:15</td><td>SAI</td><td>G. ANTUNES</td></tr><tr><td>03:27</td><td>ENTRA</td><td>G. ANTUNES</td></tr><tr><td>04:09</td><td>SAI</td><td>G. ANTUNES</td></tr>
+      <tr><td colspan="3" class="hl">SALA DE SEGURANÇA</td></tr>
+      <tr><td>03:05</td><td>ENTRA</td><td>V. PACHECO</td></tr><tr><td>03:16</td><td>SAI</td><td>V. PACHECO</td></tr><tr><td>03:34</td><td>ENTRA</td><td>V. PACHECO</td></tr><tr><td>04:03</td><td>SAI</td><td>V. PACHECO</td></tr>
+      <tr><td colspan="3" class="hl">CASA DE FORÇA</td></tr>
+      <tr><td>02:57</td><td>ENTRA</td><td>H. BARROS</td></tr><tr><td>03:01</td><td>SAI</td><td>H. BARROS</td></tr><tr><td>03:09</td><td>ENTRA</td><td>H. BARROS</td></tr><tr><td>03:24</td><td>SAI</td><td>H. BARROS</td></tr><tr><td>03:58</td><td>ENTRA</td><td>H. BARROS</td></tr><tr><td>04:01</td><td>SAI</td><td>H. BARROS</td></tr>
+      <tr><td colspan="3" class="hl">DEPÓSITO DE LIMPEZA</td></tr>
+      <tr><td>03:02</td><td>ENTRA</td><td>E. MOURA</td></tr><tr><td>03:59</td><td>SAI</td><td>E. MOURA</td></tr>
+      <tr><td colspan="3" class="hl">DOCA (porta do corredor)</td></tr>
+      <tr><td>03:29</td><td>ENTRA</td><td>H. BARROS</td></tr><tr><td>03:38</td><td>SAI</td><td>H. BARROS (pelo portão da doca, com chave)</td></tr></table></div>`,
+     cap:'Cada porta vermelha do mapa registra o crachá na entrada e na saída.'},
+    {id:'bastoes', title:'Bastões de ronda', art:()=>`<div class="doc term"><h4>BASTÕES DE RONDA · LEITURA DOS PONTOS</h4><table>
+      <tr><td colspan="2" class="hl">BASTÃO 1 · V. PACHECO</td></tr>
+      <tr><td>02:26</td><td>Sala 1</td></tr><tr><td>02:30</td><td>Sala 3</td></tr><tr><td>02:37</td><td>Hall</td></tr><tr><td>02:45</td><td>Sala 5</td></tr><tr><td>04:04</td><td>Sala 1</td></tr><tr><td>04:05</td><td>Sala 3</td></tr>
+      <tr><td colspan="2" class="hl">BASTÃO 2 · M. FERRAZ</td></tr>
+      <tr><td>03:08</td><td>Sala 1</td></tr><tr><td>03:12</td><td>Sala 3</td></tr><tr><td>03:19</td><td>Hall</td></tr><tr><td>03:26</td><td>Sala 4</td></tr><tr><td>03:33</td><td>Sala 5</td></tr><tr><td>03:44</td><td>Hall</td></tr><tr><td>03:55</td><td>Sala 4</td></tr></table></div>`,
+     cap:'O vigilante encosta o bastão num ponto fixo em cada sala. O bastão grava a hora sozinho.'},
+    {id:'guarita', title:'Livro da guarita', art:()=>`<div class="doc hand"><h4>Guarita · livro de ocorrências · S. Lins</h4><table>
+      <tr><td>22:00</td><td>Assumi o posto. No pátio: van da manutenção, carro da Glória, moto do Teteu.</td></tr>
+      <tr><td>03:01</td><td>Caiu a energia. Cancela no manual.</td></tr>
+      <tr><td>03:18</td><td>Valdir veio a pé pelo pátio, pediu café e ficou fumando aqui. Voltou 03:32.</td></tr>
+      <tr><td>03:40</td><td>SAIU van da manutenção, Hélio dirigindo. "Buscar disjuntor." Não revistei, era emergência.</td></tr>
+      <tr><td>03:58</td><td>VOLTOU van da manutenção, Hélio.</td></tr>
+      <tr><td>04:20</td><td>ENTROU carro do sr. Rubens.</td></tr>
+      <tr><td>04:55</td><td>ENTROU viatura da PM. Van revistada: vazia.</td></tr></table>
+      <p class="obs">Nenhum pedestre saiu a noite toda. Nenhum outro veículo.</p></div>`,
+     cap:'Escrito à mão pela vigilante Soraia, que está fora de suspeita.'},
+    {id:'os', title:'Ordem de serviço', art:()=>`<div class="doc hand"><h4>Manutenção · ordem de serviço nº 0412 · H. Barros</h4><table>
+      <tr><td>03:05</td><td>Chamado do líder do turno: queda geral.</td></tr>
+      <tr><td>03:09</td><td>Primeira entrada na casa de força. Disjuntor geral queimado.</td></tr>
+      <tr><td>03:29</td><td>Passei na doca pegar ferramenta.</td></tr>
+      <tr><td>03:40</td><td>Saída com a van para o almoxarifado da Rua do Porto.</td></tr>
+      <tr><td>03:58</td><td>Retorno e troca do disjuntor.</td></tr>
+      <tr><td>04:00</td><td>Energia normalizada.</td></tr></table></div>`,
+     cap:'Preenchida pelo próprio eletricista ao fim do serviço.'},
+    {id:'laudo', title:'Laudo da concessionária', art:()=>`<div class="doc receipt"><h4>PORTO ÂMBAR ENERGIA</h4><p class="c">vistoria técnica · quinta 06:40</p><hr>
+      <p>Local: Museu Farol, casa de força.</p><p>Disjuntor geral retirado (250 A): <b>sem sinal de queima ou curto</b>. Testado em bancada: funcionando.</p><p>Conclusão: a peça não falhou. Foi <b>desarmada à mão</b>.</p><hr>
+      <p>Almoxarifado da Rua do Porto: fecha às 18h, sem plantão noturno.</p></div>`,
+     cap:'Pedido pelo chefe de segurança logo cedo.'},
+    {id:'chaves', title:'Controle de chaves', art:()=>`<div class="doc hand"><h4>Claviculário · situação na quarta à noite</h4><table class="wrap">
+      <tr><td>Mestra das salas</td><td>V. Pacheco (líder do turno)</td></tr>
+      <tr><td>Casa de força</td><td>H. Barros (plantão)</td></tr>
+      <tr><td>Portão da doca</td><td>H. Barros (plantão)</td></tr>
+      <tr><td>T-3, trava da moldura da Sala 3</td><td>cópia única. Retirada terça 14:10 por G. Antunes para a remontagem. <b>Não devolvida.</b></td></tr></table></div>`,
+     cap:'Caderno do armário de chaves, na sala de segurança.'},
+    {id:'post', title:'Post do museu', art:()=>`<div class="doc chat" style="background:#fff;color:#1c2135"><h4 style="color:#1c2135;border-color:#d5dacb">@museufarol · terça</h4>${ART.travessia()}
+      <p style="font-size:14px"><b>museufarol</b> Ela voltou! Depois de quatro meses no restauro, A Travessia (1931) está de novo na Sala 3. Novidade: moldura com trava antifurto. Só o laboratório de restauro tem a chave. 🔐</p>
+      <p style="font-size:13px;color:#4d566f"><b>glo.antunes</b> quinze anos cuidando dela 💔</p>
+      <p style="font-size:13px;color:#4d566f"><b>helio.barros.eletrica</b> orgulho da prima 👏</p></div>`,
+     cap:'Publicação do perfil do museu, com dois comentários. Página inventada para este caso.'}
+  ],
+  questions:[
+    {id:'q1', q:'Quem tirou o quadro da parede?', options:[['rubens','Rubens Catão'],['valdir','Valdir Pacheco'],['teteu','Mateus "Teteu" Ferraz'],['gloria','Glória Antunes'],['helio','Hélio Barros'],['edna','Edna Moura']], answer:'gloria'},
+    {id:'q2', q:'Quem foi o cúmplice?', options:[['rubens','Rubens Catão'],['valdir','Valdir Pacheco'],['teteu','Mateus "Teteu" Ferraz'],['gloria','Glória Antunes'],['helio','Hélio Barros'],['edna','Edna Moura']], answer:'helio'},
+    {id:'q3', q:'Como o quadro saiu do museu?', options:[['lixo','No carrinho da limpeza, junto com o lixo das 05:30'],['pe','A pé, pelo portão de pedestres, no escuro'],['van','Na van da manutenção, às 03:40'],['lab','Não saiu: está escondido no laboratório'],['carro','No carro do chefe de segurança']], answer:'van'}
+  ],
+  hints:[
+    'Compare o que cada um escreveu no grupo com os leitores de crachá. Três pessoas disseram algo que os registros desmentem. Uma delas só queria parecer mais dedicada.',
+    'A trava foi aberta sem arrombar. Quem estava com a única chave? E a que horas essa pessoa saiu de onde jurou que não saiu?',
+    'A luz caiu às 03:00. Alguém entrou na casa de força antes disso. E o único veículo que saiu não tinha para onde ir.'
+  ],
+  solution:{
+    who:'Glória Antunes tirou o quadro. Hélio Barros, primo dela, foi o cúmplice',
+    steps:[
+      '<b>A janela do roubo.</b> O bastão do Teteu marcou a Sala 3 às 03:12 com o quadro na parede. Às 03:40 saiu o único veículo da noite. O quadro foi tirado entre 03:12 e 03:40.',
+      '<b>A trava aponta para Glória.</b> Ela foi aberta sem arrombar e só existe uma chave T-3, retirada por Glória na terça e nunca devolvida. O post do museu confirma: só o restauro tem a chave.',
+      '<b>Glória mentiu no grupo.</b> Às 03:41 ela escreveu que não saía do laboratório desde as 22h. O leitor mostra que saiu às 03:15 e voltou às 03:27: doze minutos, logo depois da ronda do Teteu, tempo de ir à Sala 3 ao lado, soltar o quadro e deixá-lo no corredor da doca.',
+      '<b>O apagão foi provocado.</b> Hélio entrou na casa de força às 02:57, três minutos antes de a luz cair, e escreveu na ordem de serviço que a primeira entrada foi às 03:09. A mensagem que ele apagou às 02:55 começava com "tô indo pra casa de f". O laudo diz que o disjuntor não queimou: foi desarmado à mão.',
+      '<b>A van levou o quadro.</b> Hélio entrou na doca às 03:29, dois minutos depois de Glória voltar ao laboratório, e saiu pelo portão dele. Às 03:40 a van passou pela guarita sem revista, para buscar uma peça num almoxarifado que fecha às 18h. Voltou vazia às 03:58 e a luz voltou em dois minutos.',
+      '<b>Os outros.</b> Valdir disse que não saiu da sala de segurança, mas das 03:18 às 03:32 fumava na guarita, com Soraia de testemunha: mentiu para não parecer relapso. Teteu tem bastão marcado a cada poucos minutos, longe da doca. Edna ficou no depósito das 03:02 às 03:59. Rubens só chegou às 04:20.',
+      '<b>O vínculo e o motivo.</b> "A tia mandou avisar" e "orgulho da prima": Glória e Hélio são primos. Ela recebeu aviso prévio depois de quinze anos e ia perder o quadro em que trabalhou quatro meses.'
+    ],
+    epi:'A Travessia estava num guarda-volumes a seis quarteirões do museu, embrulhada num cobertor de mudança. Hélio confessou primeiro. Glória só perguntou se a tela tinha pegado umidade.'
+  }
+});
+
+/* ---------------- CASO 5 ---------------- */
+Object.assign(ART,{
+expoMapa(){
+  const stands=[]; let n=1;
+  for(let r=0;r<3;r++) for(let c=0;c<6;c++){ const x=40+c*42, y=58+r*40; const hot=(n===14||n===15); stands.push(`<rect x="${x}" y="${y}" width="34" height="26" fill="${n===14?'#f3c62f':n===15?'#b79be0':'#e9ece3'}" stroke="#1c2135" stroke-width="${hot?2:1}"/><text x="${x+17}" y="${y+17}" class="t-mono" font-size="${hot?9:7}" font-weight="${hot?600:400}" fill="#1c2135" text-anchor="middle">${n}</text>`); n++; }
+  return `<svg viewBox="0 0 360 280" role="img" aria-label="Planta do pavilhão">
+  <rect width="360" height="280" fill="#16203a"/>
+  <rect x="24" y="30" width="276" height="160" fill="#cfd4dc" stroke="#1c2135" stroke-width="2.5"/>
+  <text x="162" y="48" class="t-disp" font-size="12" fill="#1c2135" text-anchor="middle">PAVILHÃO · PORTO ÂMBAR GEEK FEST</text>
+  ${stands.join('')}
+  <rect x="140" y="27" width="44" height="6" fill="#8d949c"/><text x="162" y="20" class="t-mono" font-size="7.5" fill="#c9d2ea" text-anchor="middle">PORTÃO A · público · trancado às 22:30</text>
+  <rect x="297" y="120" width="6" height="34" fill="#e5483d"/><text x="306" y="112" class="t-mono" font-size="7" fill="#ffb3ad">PORTÃO B</text><text x="306" y="166" class="t-mono" font-size="6" fill="#ffb3ad">staff · único</text><text x="306" y="175" class="t-mono" font-size="6" fill="#ffb3ad">aberto à noite</text>
+  <circle cx="318" cy="137" r="7" fill="#f08a24" stroke="#1c2135"/><text x="330" y="140" class="t-mono" font-size="6" fill="#e8ecf7">vigia</text>
+  <circle cx="276" cy="176" r="5" fill="#2456c9"/><path d="M268 168q8-8 16 0M271 172q5-5 10 0" fill="none" stroke="#2456c9" stroke-width="1.5"/>
+  <rect x="24" y="204" width="276" height="44" fill="#2a3040"/><text x="162" y="230" class="t-mono" font-size="8" fill="#c9d2ea" text-anchor="middle">ESTACIONAMENTO · cancela lê a tag dos carros</text>
+  <g class="t-mono" font-size="7" fill="#e8ecf7"><rect x="24" y="258" width="10" height="8" fill="#f3c62f"/><text x="38" y="265">14 Toca do Dado</text><rect x="118" y="258" width="10" height="8" fill="#b79be0"/><text x="132" y="265">15 Cripta Cards</text><circle cx="214" cy="262" r="4" fill="#2456c9"/><text x="222" y="265">Wi-Fi: alcança só o</text><text x="222" y="275">pavilhão e o Portão B</text></g>
+  </svg>`; },
+storyBar(){ return `<svg viewBox="0 0 300 380" role="img" aria-label="Story do Bar do Zeca">
+  <rect width="300" height="380" fill="#2a1420"/>
+  <rect x="60" y="40" width="180" height="46" rx="6" fill="none" stroke="#ff5fa2" stroke-width="3"/><text x="150" y="72" class="t-disp" font-size="24" fill="#ff8fc0" text-anchor="middle">BAR DO ZECA</text>
+  <rect x="0" y="270" width="300" height="110" fill="#5c3b22"/><rect x="20" y="258" width="260" height="16" rx="4" fill="#7a5232"/>
+  <g transform="translate(92 190)"><path d="M-44 80 Q-44 22 0 14 Q44 22 44 80Z" fill="#1d6b4f"/><ellipse cx="0" cy="-8" rx="24" ry="27" fill="#d9a47a"/><path d="M-26 -18 Q-24 -44 0 -44 Q24 -44 26 -18Z" fill="#d42a35"/><rect x="-30" y="-21" width="44" height="7" rx="3" fill="#a81d27"/><circle cx="-8" cy="-6" r="2.3" fill="#141826"/><circle cx="9" cy="-6" r="2.3" fill="#141826"/><path d="M-8 8q8 8 17 0" fill="none" stroke="#7a2e2e" stroke-width="2.2"/></g>
+  <g transform="translate(208 190)"><path d="M-28 -6 Q-32 -46 0 -46 Q32 -46 28 -6 L30 20 L-30 20Z" fill="#8a4fd0"/><path d="M-44 80 Q-44 22 0 14 Q44 22 44 80Z" fill="#22242c"/><ellipse cx="0" cy="-8" rx="24" ry="27" fill="#f0d2b0"/><path d="M-25 -12 Q-22 -40 2 -38 Q24 -36 25 -12 Q16 -28 -6 -26 Q-18 -22 -25 -12Z" fill="#8a4fd0"/><g fill="none" stroke="#e9ece3" stroke-width="2.2"><circle cx="-9" cy="-6" r="7"/><circle cx="10" cy="-6" r="7"/><path d="M-2 -6h5"/></g><path d="M-7 10q8 5 15 0" fill="none" stroke="#7a2e2e" stroke-width="2.2"/></g>
+  <g fill="#f3c62f" stroke="#fff" stroke-width="2"><rect x="128" y="226" width="16" height="34" rx="2"/><rect x="156" y="226" width="16" height="34" rx="2"/></g><rect x="128" y="226" width="16" height="7" fill="#fff"/><rect x="156" y="226" width="16" height="7" fill="#fff"/>
+  <ellipse cx="150" cy="284" rx="40" ry="10" fill="#e9ece3"/><ellipse cx="150" cy="281" rx="30" ry="7" fill="#c9862b"/>
+  <text x="150" y="330" class="t-hand" font-size="17" fill="#fff" text-anchor="middle">mesa 7 fechando a casa de novo 🍻</text>
+  <rect x="10" y="10" width="120" height="20" rx="10" fill="#000" opacity=".5"/><text x="20" y="24" class="t-mono" font-size="9" fill="#fff">@bardozeca · 01:18</text>
+  <text x="150" y="362" class="t-mono" font-size="8" fill="#ffb3d5" text-anchor="middle">Rua do Porto, 55 · madrugada de domingo</text>
+  </svg>`; }
+});
+CASES.push({
+  id:'caso-5', num:'05', level:3, title:'O Dragão de R$ 280 Mil', crime:'Roubo com cúmplice', place:'Porto Âmbar Geek Fest',
+  teaser:'Uma carta rara some de uma vitrine trancada com senha, num pavilhão fechado. Você recebe três áudios, prints de dois grupos e os rastros digitais de cada um: Wi-Fi, corridas de app, pedágio, comanda de bar.',
+  peopleLabel:'6 pessoas no caso · sem depoimentos', fichaLabel:'O que se sabe',
+  brief:[
+    'De novo, ninguém fala com você. O que existe são conversas entre eles e os rastros que cada um deixou sem querer naquela noite.',
+    'Os registros aqui não trazem nome pronto: um mostra só o modelo do celular, outro só um endereço, outro só uma placa. Você precisa <b>cruzar um documento com o outro</b> para saber quem é quem e onde cada pessoa estava de verdade. São dois envolvidos: quem abriu a vitrine e quem ajudou.'
+  ],
+  email:{from:'Abel Tavares · dono da loja Toca do Dado (estande 14)', to:'Agência Lupa', date:'domingo, 09:20', subject:'3 áudios transcritos: "roubaram o Dragão"',
+    body:[
+      '<b>▶ Áudio 1 (0:48)</b> Detetive, é o Abel, da Toca do Dado. Eu trouxe pra feira a minha carta mais valiosa, um <b>Dragão Prismático de primeira edição</b>, avaliada em R$ 280 mil. Ficou na vitrine do estande, que tem trava eletrônica com senha. Hoje cedo a vitrine estava trancada e vazia.',
+      '<b>▶ Áudio 2 (1:05)</b> O pavilhão fecha pro público às 22h. Às 22:30 trancam o Portão A e só fica o <b>Portão B</b>, com um vigia da organização. Eu troquei a senha da vitrine ontem à noite e só falei pra duas pessoas, de boca. A carta tem seguro, então já sei que vão olhar torto pra mim também.',
+      '<b>▶ Áudio 3 (0:39)</b> Juntei o que deu: os grupos, o histórico da trava, o Wi-Fi que a organização liberou, as corridas da conta da loja, a tag do meu carro pra você não dizer que escondi nada, e umas coisas que achei por conta. O resto é com você.'
+    ],
+    attach:['grupo "Staff Toca do Dado" (2 prints)','grupo "Segurança Noturna"','planta do pavilhão','histórico da trava','Wi-Fi EXPO-STAFF','corridas da conta da loja','extrato da tag','comanda de bar','story','recibo de entrega']},
+  facts:[
+    ['22:18','Vitrine trancada com a carta dentro.'],
+    ['22:30','Portão A trancado. Só o Portão B fica aberto, com vigia.'],
+    ['08:31','Domingo: vitrine trancada e vazia.'],
+    ['Senha','Trocada no sábado às 20:50. Não foi escrita em lugar nenhum.']
+  ],
+  suspects:[
+    {id:'abel', name:'Abel Tavares', role:'Dono da Toca do Dado · 44 anos',
+     pic:{skin:'#c99672',hair:'#2a1c14',style:'bald',cloth:'#22242c',beard:true,mouth:'frown'},
+     motive:'Autor dos áudios. Dono da carta e do seguro dela. Mora em Vila do Cedro, do outro lado da Ponte Norte, e vai e volta de carro.'},
+    {id:'kelly', name:'Kelly Nunes', role:'Gerente do estande · 29 anos',
+     pic:{skin:'#b9825e',hair:'#15131a',style:'long',cloth:'#b0307a',earrings:'#e9ece3',mouth:'neutral'},
+     motive:'Abre e fecha o estande. Trabalha com Abel há seis anos.'},
+    {id:'nando', name:'Fernando "Nando" Vidal', role:'Vendedor e juiz de torneio · 26 anos',
+     pic:{skin:'#d9a47a',hair:'#3a2a1c',style:'short',cloth:'#1d6b4f',cap:'#d42a35',capPlain:true,mouth:'smirk'},
+     motive:'Ajuda no fechamento. Não tira o boné vermelho.'},
+    {id:'pri', name:'Priscila "Pri" Okada', role:'Caixa e redes sociais · 22 anos',
+     pic:{skin:'#f0d2b0',hair:'#d8b24a',style:'bun',cloth:'#2456c9',earrings:'#f3c62f',mouth:'smirk'},
+     motive:'Cuida do notebook do caixa, que dorme ligado no estande. Sai antes do fechamento.'},
+    {id:'yuri', name:'Yuri Bastos', role:'Dono da Cripta Cards (estande 15) · 33 anos',
+     pic:{skin:'#f0d2b0',hair:'#8a4fd0',style:'bob',cloth:'#22242c',glasses:'#e9ece3',mouth:'smirk'},
+     motive:'Concorrente e vizinho de estande. Tentou comprar a carta duas vezes na feira.'},
+    {id:'wag', name:'Wagner "Wag" Leal', role:'Vigia noturno do Portão B · 31 anos',
+     pic:{skin:'#8d5a3b',hair:'#15131a',style:'short',cloth:'#37415f',vest:'#f08a24',mustache:true,mouth:'neutral'},
+     motive:'Contratado pela organização, não pela loja. Usa colete laranja e fica sozinho no Portão B a madrugada inteira.'}
+  ],
+  witnesses:[
+    {name:'Paulão', role:'Coordenador de segurança da feira · fora de suspeita', statement:'Passou a noite na central, do outro lado do pavilhão, com mais dois vigias. É ele quem cobra os reportes no grupo da segurança.'}
+  ],
+  clues:[
+    {id:'staff1', title:'Grupo da loja: sábado', art:()=>`<div class="doc chat"><h4>Staff Toca do Dado 🎲 · 4 participantes</h4>
+      <div class="msg"><span class="who">Kelly</span>Estande aberto ☀️ bora<small>08:03</small></div>
+      <div class="msg"><span class="who">Pri</span>chegando, tô na catraca<small>08:40</small></div>
+      <div class="msg"><span class="who">Nando</span>cheguei, foi mal o atraso 😬<small>09:15</small></div>
+      <div class="msg"><span class="who">Abel</span>Cheguei com a carta. Dragão na vitrine. Ninguém encosta.<small>10:06</small></div>
+      <div class="msg"><span class="who">Pri</span>gente, o Yuri da Cripta veio aqui DE NOVO oferecer 250 mil na carta<small>14:20</small></div>
+      <div class="msg"><span class="who">Abel</span>Já falei que não vendo. Muito menos pra ele.<small>14:22</small></div>
+      <div class="msg"><span class="who">Pri</span>Kelly, teu boy vai trabalhar na feira hoje de novo?<small>16:05</small></div>
+      <div class="msg"><span class="who">Kelly</span>vai, plantão no portão B a noite toda 😴<small>16:06</small></div>
+      <div class="msg"><span class="who">Abel</span>Troquei a senha da vitrine agora. Kelly e Nando, falo pra vocês dois no fechamento. Não vou escrever aqui.<small>20:52</small></div>
+      <div class="msg"><span class="who">Pri</span>e eu?<small>20:53</small></div>
+      <div class="msg"><span class="who">Abel</span>Você sai antes, não precisa.<small>20:53</small></div>
+      <div class="msg"><span class="who">Kelly</span>Abel, e a minha comissão? Três meses.<small>20:58</small></div>
+      <div class="msg"><span class="who">Abel</span>Depois da feira a gente conversa.<small>21:00</small></div></div>`,
+     cap:'Print 1 de 2, do celular do Abel.'},
+    {id:'staff2', title:'Grupo da loja: noite e domingo', art:()=>`<div class="doc chat"><h4>Staff Toca do Dado 🎲 · 4 participantes</h4>
+      <div class="msg"><span class="who">Kelly</span>Vitrine trancada, estande fechado. Indo.<small>sáb 22:19</small></div>
+      <div class="msg"><span class="who">Kelly</span>em casa. morta. boa noite 😴<small>sáb 22:50</small></div>
+      <div class="msg"><span class="who">Nando</span>já tô em casa deitado tb. até amanhã<small>sáb 23:30</small></div>
+      <div class="msg"><span class="who">Pri</span>GENTE. a vitrine tá trancada e VAZIA. cadê o dragão???<small>dom 08:31</small></div>
+      <div class="msg"><span class="who">Abel</span>COMO É?<small>dom 08:33</small></div>
+      <div class="msg"><span class="who">Kelly</span>como assim?? eu dormi a noite inteira, só vi agora. tô indo<small>dom 08:36</small></div>
+      <div class="msg"><span class="who">Nando</span>eita. saí da cama agora. ontem fui direto pra casa, não sei de nada<small>dom 08:41</small></div>
+      <div class="msg"><span class="who">Abel</span>Só eu, Kelly e Nando sabemos a senha. Vou chamar um detetive.<small>dom 08:45</small></div></div>`,
+     cap:'Print 2 de 2. É o que cada um contou aos colegas.'},
+    {id:'seg', title:'Grupo da segurança', art:()=>`<div class="doc chat"><h4>Segurança Noturna · Geek Fest</h4>
+      <div class="msg"><span class="who">Paulão (coord.)</span>Portão A trancado. Só o B aberto. Wag no B, reporta de meia em meia hora. Entrou ou saiu alguém, avisa aqui com nome.<small>sáb 22:30</small></div>
+      <div class="msg"><span class="who">Wag</span>Portão B: saiu o pessoal do estande 14 e do 15. Fechado.<small>sáb 23:00</small></div>
+      <div class="msg"><span class="who">Wag</span>Portão B sem movimento.<small>dom 00:30</small></div>
+      <div class="msg"><span class="who">Wag</span>Portão B sem movimento.<small>dom 01:00</small></div>
+      <div class="msg"><span class="who">Wag</span>Portão B sem movimento. Ninguém entrou nem saiu desde as 23h.<small>dom 01:30</small></div>
+      <div class="msg"><span class="who">Wag</span>Portão B sem movimento.<small>dom 02:00</small></div>
+      <div class="msg"><span class="who">Paulão (coord.)</span>Wag, o estande 14 diz que sumiu uma carta. Entrou alguém de madrugada?<small>dom 08:50</small></div>
+      <div class="msg"><span class="who">Wag</span>Ninguém, chefe. Pode ver meus reportes.<small>dom 08:52</small></div></div>`,
+     cap:'Grupo da equipe contratada pela organização da feira.'},
+    {id:'mapa', title:'Planta do pavilhão', art:()=>ART.expoMapa(), cap:'O estande 14 é o da Toca do Dado. O 15 é o do concorrente.'},
+    {id:'trava', title:'Histórico da trava', art:()=>`<div class="doc term"><h4>TRAVAFÁCIL · VITRINE ESTANDE 14 · SENHA ÚNICA DE 6 DÍGITOS</h4><table>
+      <tr><td>sáb 20:50</td><td>senha alterada pelo administrador</td></tr>
+      <tr><td>sáb 22:18</td><td>TRANCADA</td></tr>
+      <tr><td>dom 01:26</td><td class="hl">ABERTA · senha correta na 1ª tentativa</td></tr>
+      <tr><td>dom 01:28</td><td>TRANCADA</td></tr>
+      <tr><td>dom 09:04</td><td>ABERTA (administrador)</td></tr></table></div>`,
+     cap:'A trava não sabe quem digitou. Só sabe se a senha estava certa.'},
+    {id:'wifi', title:'Wi-Fi EXPO-STAFF', art:()=>`<div class="doc term"><h4>EXPO-STAFF · APARELHOS CADASTRADOS PELO ESTANDE 14</h4><table>
+      <tr><td>sáb 08:02</td><td>CONECTA</td><td>Galaxy-A54</td></tr>
+      <tr><td>sáb 08:41</td><td>CONECTA</td><td>iPhone-13</td></tr>
+      <tr><td>sáb 08:44</td><td>CONECTA</td><td>TOCA-CAIXA (notebook)</td></tr>
+      <tr><td>sáb 09:16</td><td>CONECTA</td><td>moto-g84</td></tr>
+      <tr><td>sáb 10:05</td><td>CONECTA</td><td>S23-Ultra</td></tr>
+      <tr><td>sáb 22:24</td><td>SAI</td><td>iPhone-13</td></tr>
+      <tr><td>sáb 22:25</td><td>SAI</td><td>Galaxy-A54</td></tr>
+      <tr><td>sáb 22:31</td><td>SAI</td><td>moto-g84</td></tr>
+      <tr><td>sáb 22:34</td><td>SAI</td><td>S23-Ultra</td></tr>
+      <tr><td>dom 01:14</td><td>CONECTA</td><td>Galaxy-A54</td></tr>
+      <tr><td>dom 01:33</td><td>SAI</td><td>Galaxy-A54</td></tr>
+      <tr><td>dom 08:29</td><td>CONECTA</td><td>iPhone-13</td></tr>
+      <tr><td colspan="3">TOCA-CAIXA: conectado sem interrupção.</td></tr></table></div>`,
+     cap:'O celular conecta sozinho quando chega perto. A rede mostra o modelo do aparelho, não o dono.'},
+    {id:'corridas', title:'Corridas da conta da loja', art:()=>`<div class="doc receipt"><h4>VAI-JÁ CORRIDAS</h4><p class="c">conta empresarial: Toca do Dado</p><hr>
+      <p><b>sáb 22:24 → 22:52</b><br>Passageiro: Priscila O.<br>Pavilhão (Portão B) → Rua Sete, 410</p><hr>
+      <p><b>sáb 22:26 → 22:44</b><br>Passageiro: Kelly N.<br>Pavilhão (Portão B) → Rua das Acácias, 80</p><hr>
+      <p><b>sáb 22:31 → 22:47</b><br>Passageiro: Fernando V.<br>Pavilhão (Portão B) → Rua do Porto, 55</p><hr>
+      <p class="c">Nenhuma outra corrida na conta até domingo 08:05.</p></div>`,
+     cap:'A loja paga a volta dos funcionários. Só aparecem aqui as corridas pedidas na conta da empresa.'},
+    {id:'tag', title:'Extrato da tag', art:()=>`<div class="doc term"><h4>PASSE LIVRE · TAG DO VEÍCULO DE A. TAVARES</h4><table>
+      <tr><td>sáb 09:12</td><td>Pedágio Ponte Norte · sentido Porto Âmbar</td></tr>
+      <tr><td>sáb 10:01</td><td>Estacionamento do Pavilhão · ENTRADA</td></tr>
+      <tr><td>sáb 22:35</td><td>Estacionamento do Pavilhão · SAÍDA</td></tr>
+      <tr><td>sáb 23:21</td><td>Pedágio Ponte Norte · sentido Vila do Cedro</td></tr>
+      <tr><td>dom 08:14</td><td>Pedágio Ponte Norte · sentido Porto Âmbar</td></tr>
+      <tr><td>dom 09:02</td><td>Estacionamento do Pavilhão · ENTRADA</td></tr></table></div>`,
+     cap:'A Ponte Norte fica a 46 minutos do pavilhão e é o único caminho para Vila do Cedro.'},
+    {id:'comanda', title:'Comanda do bar', art:()=>`<div class="doc receipt"><h4>BAR DO ZECA</h4><p class="c">Rua do Porto, 55</p><hr><p><b>MESA 7 · 2 pessoas</b></p><table>
+      <tr><td>22:51</td><td>2 chopes</td></tr><tr><td>23:34</td><td>2 chopes</td></tr><tr><td>00:20</td><td>porção de batata</td></tr><tr><td>01:05</td><td>2 chopes</td></tr><tr><td>01:40</td><td>2 chopes</td></tr><tr><td>02:10</td><td>conta fechada · pago por Y. Bastos</td></tr></table><hr>
+      <p class="c">O bar fica a 25 min de carro do pavilhão.</p></div>`,
+     cap:'Abel conseguiu a segunda via com o dono do bar.'},
+    {id:'story', title:'Story do bar', art:()=>ART.storyBar(), cap:'Publicado pelo perfil do bar na madrugada de domingo. Perfil inventado para este caso.'},
+    {id:'moto', title:'Recibo de entrega', art:()=>`<div class="doc receipt"><h4>VAIMOTO ENTREGAS</h4><p class="c">pedido nº 88213</p><hr><table>
+      <tr><td>Conta</td><td>"Ana", criada dom 01:19</td></tr>
+      <tr><td>Pedido</td><td>dom 01:22</td></tr>
+      <tr><td>Coleta</td><td><b>dom 01:31</b> · Pavilhão de Exposições, Portão B</td></tr>
+      <tr><td>Item</td><td>1 envelope rígido, tamanho A5</td></tr>
+      <tr><td>Destino</td><td>Rodoviária, armários 24h · armário 31</td></tr>
+      <tr><td>Entrega</td><td>dom 01:52</td></tr>
+      <tr><td>Pagto.</td><td>dinheiro, na coleta</td></tr></table><hr>
+      <p>Obs. do entregador: "Quem me passou o envelope foi o vigia do portão, de colete laranja. Tinha uma moça de moletom atrás da grade, não saiu."</p></div>`,
+     cap:'Abel perguntou nos apps de entrega se houve coleta no pavilhão de madrugada. Um respondeu.'}
+  ],
+  questions:[
+    {id:'q1', q:'Quem abriu a vitrine e pegou a carta?', options:[['abel','Abel Tavares'],['kelly','Kelly Nunes'],['nando','Fernando "Nando" Vidal'],['pri','Priscila "Pri" Okada'],['yuri','Yuri Bastos'],['wag','Wagner "Wag" Leal']], answer:'kelly'},
+    {id:'q2', q:'Quem foi o cúmplice?', options:[['abel','Abel Tavares'],['kelly','Kelly Nunes'],['nando','Fernando "Nando" Vidal'],['pri','Priscila "Pri" Okada'],['yuri','Yuri Bastos'],['wag','Wagner "Wag" Leal']], answer:'wag'},
+    {id:'q3', q:'Como a carta saiu do pavilhão?', options:[['carro','No carro do Abel, na saída das 22:35'],['bar','No bolso do Nando, a caminho do bar'],['vizinho','Não saiu: está escondida no estande 15'],['moto','Num envelope levado por um motoboy à 01:31'],['note','Dentro do notebook do caixa, buscado no domingo']], answer:'moto'}
+  ],
+  hints:[
+    'O Wi-Fi não diz de quem é cada celular. Compare a hora em que cada aparelho conectou no sábado de manhã com a hora em que cada pessoa avisou no grupo que chegou.',
+    'Três pessoas sabiam a senha. Para cada uma, ache um registro que mostre onde ela estava à 01:26. Um endereço aparece em dois documentos.',
+    'O vigia jurou que ninguém passou pelo Portão B. Existe um papel de fora da feira que diz que alguém esteve lá à 01:31, e quem entregou o quê.'
+  ],
+  solution:{
+    who:'Kelly Nunes abriu a vitrine. Wag, o vigia do Portão B e namorado dela, foi o cúmplice',
+    steps:[
+      '<b>A hora e a senha.</b> A trava foi aberta à 01:26 com a senha certa de primeira. Só Abel, Kelly e Nando sabiam a senha nova. O ladrão é um dos três, ou alguém a quem um deles contou.',
+      '<b>Abel estava longe.</b> A tag mostra o carro saindo do pavilhão às 22:35 e cruzando a Ponte Norte às 23:21, a 46 minutos dali. Só volta a cruzar às 08:14. O celular dele, o S23-Ultra que conectou às 10:05 junto com o "cheguei" no grupo, não aparece de madrugada.',
+      '<b>Nando mentiu, mas estava no bar.</b> Ele disse que foi direto pra casa. A corrida dele terminou na Rua do Porto, 55, o endereço do Bar do Zeca. À 01:18 o story mostra o boné vermelho na mesa 7 ao lado de Yuri, que pagou a conta às 02:10. O bar fica a 25 minutos do pavilhão. Nando escondeu que bebia com o concorrente do patrão, e os dois têm álibi.',
+      '<b>O Galaxy-A54 é da Kelly.</b> Ele conectou às 08:02 no sábado, um minuto antes de ela escrever "estande aberto", e saiu da rede às 22:25, um minuto antes da corrida dela. Esse mesmo aparelho voltou à rede à 01:14 e saiu à 01:33. Kelly disse que dormiu a noite inteira. O celular dela estava dentro do pavilhão na hora exata em que a vitrine abriu.',
+      '<b>Só se entra pelo Portão B, e o vigia é o namorado.</b> Às 16:06 Kelly conta que o namorado está de plantão no Portão B a noite toda. Wag reportou "ninguém entrou nem saiu" à 01:30, com ela lá dentro.',
+      '<b>A carta saiu de moto.</b> Um minuto depois desse reporte, um motoboy coletou um envelope no Portão B. Quem entregou foi "o vigia de colete laranja", com "uma moça de moletom atrás da grade". Kelly nem precisou sair com a carta: foi embora de mãos vazias e o envelope seguiu para um armário na rodoviária.',
+      '<b>Pri e o motivo.</b> Pri não sabia a senha e o iPhone dela só volta à rede às 08:29. O notebook ficou ligado a noite toda porque dorme no estande. Kelly cobrava três meses de comissão atrasada.'
+    ],
+    epi:'O armário 31 da rodoviária foi aberto com ordem judicial na segunda. O Dragão estava lá, dentro do envelope, ainda no estojo. Abel pagou as comissões de todo mundo na mesma semana.'
+  }
+});
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+const KEY='agencia-lupa-v1';
+const blank=()=>({view:'home',tab:'caso',notes:{},off:{},hints:{},attempts:{},answers:{},done:{},last:{}});
+let S=blank();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function loadLocal(){ try{ const d=JSON.parse(localStorage.getItem(KEY)||'null'); if(d&&typeof d==='object') S=Object.assign(blank(),d); }catch(e){} }
+const byId=id=>CASES.find(c=>c.id===id);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const app=document.getElementById('app');
+
+function rank(d){
+  if(d.gaveUp) return ['Caso encerrado com ajuda','Você viu a solução antes de acertar.'];
+  const t=d.attempts+d.hints;
+  if(t<=1) return ['Detetive lendário','Primeira acusação, nenhuma dica.'];
+  if(t<=2) return ['Investigador sênior',''];
+  if(t<=4) return ['Detetive',''];
+  return ['Estagiário persistente',''];
+}
+function pips(n){ return `<span class="pips" aria-label="Dificuldade ${n} de 3">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span>`; }
+
+/* =========================================================
+   TELAS
+   ========================================================= */
+function viewHome(){
+  const solvedCount=CASES.filter(c=>S.done[c.id]).length;
+  return `
+  <header class="hero">
+    <span class="eyebrow">Porto Âmbar · arquivo de casos · ${solvedCount} de ${CASES.length} resolvidos</span>
+    <h1>Agência <span>Lupa</span></h1>
+    <p>Cinco casos, nenhum assassinato. Os três primeiros têm depoimentos e vão ficando mais difíceis. O quarto e o quinto são só documentos e prints de conversa, com culpado e cúmplice. Todos se resolvem só com o que está na página.</p>
+  </header>
+  <ul class="rules">
+    <li>Leia o caso, as fichas dos suspeitos e os depoimentos.</li>
+    <li>Toque em cada pista para ampliar. Os detalhes pequenos importam.</li>
+    <li>Nem todo mundo que mente é culpado, e nem toda pista aponta para o crime.</li>
+    <li>Quando tiver certeza, faça a acusação. Se errar, o jogo não conta o que estava certo. Dica só aparece se você pedir. Menos tentativas e menos dicas, melhor a patente.</li>
+  </ul>
+  <div class="files">
+    ${CASES.map(c=>{ const d=S.done[c.id]; return `
+    <button class="file" type="button" data-open="${c.id}">
+      <span class="num">${c.num}</span>
+      <span class="body">
+        <span class="meta"><span>${c.crime}</span><span>${esc(c.place)}</span><span>${pips(c.level)}</span></span>
+        <h2>${esc(c.title)}</h2>
+        <p>${esc(c.teaser)}</p>
+        <span class="meta"><span>${c.suspects.length} suspeitos</span><span>${c.clues.length} pistas</span>${d?`<span>${esc(rank(d)[0])}</span>`:''}</span>
+      </span>
+      ${d?`<span class="status">${d.gaveUp?'ENCERRADO':'RESOLVIDO'}</span>`:''}
+    </button>`; }).join('')}
+  </div>
+  <div class="foot"><span>Seu progresso e suas anotações ficam salvos neste aparelho.</span><button class="linkbtn" type="button" data-reset="${S._askReset?'go':'ask'}">${S._askReset?'Toque de novo para apagar tudo':'Apagar progresso'}</button></div>`;
+}
+
+function tabCaso(c){
+  return `
+  <div class="story"><span class="kicker">Caso ${c.num} · ${c.crime} · ${esc(c.place)}</span>
+    ${c.brief.map((p,i)=>`<p class="${i===0?'lead':''}">${p}</p>`).join('')}</div>
+  ${c.email?`<article class="mail"><header><b>${esc(c.email.subject)}</b><span>De: ${esc(c.email.from)}</span><span>Para: ${esc(c.email.to)} · ${esc(c.email.date)}</span></header>${c.email.body.map(p=>`<p>${p}</p>`).join('')}<div class="att"><span>Anexos (${c.email.attach.length})</span>${c.email.attach.map(a=>`<i>${esc(a)}</i>`).join('')}</div><button class="btn ghost" type="button" data-tab="pistas">Abrir os anexos</button></article>`:''}
+  <div class="box"><h3>O que já se sabe</h3><ul class="facts">${c.facts.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join('')}</ul></div>
+  <div class="row"><button class="btn ghost" type="button" data-tab="suspeitos">Ver suspeitos</button><button class="btn ghost" type="button" data-tab="pistas">Ver pistas</button></div>`;
+}
+function tabSuspeitos(c){
+  const off=S.off[c.id]||{};
+  return `<span class="kicker">${c.peopleLabel||c.suspects.length+' suspeitos'}</span>
+  ${c.suspects.map(s=>`
+  <article class="sus ${off[s.id]?'off':''}">
+    <div class="head">${portrait(Object.assign({name:s.name},s.pic))}
+      <div><h3>${esc(s.name)}</h3><div class="role">${esc(s.role)}</div>
+        <dl><div><dt>${c.fichaLabel||'Possível motivo'}</dt><dd>${s.motive}</dd></div>
+        ${s.extra?Array.from({length:s.extra.length/2},(_,i)=>`<div><dt>${s.extra[i*2]}</dt><dd>${s.extra[i*2+1]}</dd></div>`).join(''):''}</dl>
+      </div></div>
+    ${s.statement?`<blockquote>${s.statement}</blockquote>`:''}
+    <div class="act"><button class="chip" type="button" data-off="${s.id}" aria-pressed="${off[s.id]?'true':'false'}">${off[s.id]?'Voltar a suspeitar':'Descartar suspeito'}</button></div>
+  </article>`).join('')}
+  <span class="kicker">Testemunhas (fora de suspeita)</span>
+  ${c.witnesses.map(w=>`<div class="wit"><b>${esc(w.name)}</b><small>${esc(w.role)}</small><p>${w.statement}</p></div>`).join('')}`;
+}
+function tabPistas(c){
+  return `<span class="kicker">${c.clues.length} pistas · toque para ampliar</span>
+  ${c.clues.map((k,i)=>`
+  <article class="clue">
+    <div class="bar"><span class="evtag">P-${i+1}</span><h3>${esc(k.title)}</h3><button class="zoom" type="button" data-zoom="${k.id}">Ampliar</button></div>
+    <div class="art" data-zoom="${k.id}">${k.art()}</div>
+    <p class="cap">${k.cap}</p>
+  </article>`).join('')}`;
+}
+function tabNotas(c){
+  return `<span class="kicker">Bloco de notas · salvo sozinho</span>
+  <label for="notas-${c.id}" style="font-size:14px;color:var(--muted)">Anote horários, contradições e quem você já descartou.</label>
+  <textarea id="notas-${c.id}" data-notes="${c.id}" placeholder="Ex.: fulano diz que estava em tal lugar às 20h, mas a pista 3 mostra...">${esc(S.notes[c.id]||'')}</textarea>`;
+}
+function solutionBlock(c,d){
+  const r=rank(d); const idx=CASES.indexOf(c); const next=CASES[idx+1];
+  return `<div class="solved">
+    <span class="stamp ${d.gaveUp?'help':''}">${d.gaveUp?'Caso encerrado':'Caso resolvido'}</span>
+    <p class="rank">Patente: <b>${r[0]}</b><br>${d.gaveUp?'':`${d.attempts} ${d.attempts===1?'acusação':'acusações'} · ${d.hints} ${d.hints===1?'dica':'dicas'}`}</p>
+    <h3>${esc(c.solution.who)}</h3>
+    <ol>${c.solution.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+    <p class="epi">${c.solution.epi}</p>
+    <div class="row">${next?`<button class="btn" type="button" data-open="${next.id}">Abrir caso ${next.num}</button>`:''}<button class="btn ghost" type="button" data-home="1">Voltar ao arquivo</button></div>
+  </div>`;
+}
+function tabAcusar(c){
+  const d=S.done[c.id];
+  if(d) return solutionBlock(c,d);
+  const ans=S.answers[c.id]||{}; const att=S.attempts[c.id]||0; const used=S.hints[c.id]||0; const last=S.last[c.id];
+  const all=c.questions.every(q=>ans[q.id]);
+  return `<span class="kicker">Acusação formal · ${c.questions.length} respostas</span>
+  <p style="max-width:60ch">Você precisa acertar as ${c.questions.length} para a delegacia aceitar. Se qualquer uma estiver errada, a acusação é recusada, sem dizer onde está o erro nem o que estava certo.</p>
+  ${last!=null?`<div class="verdict" role="status"><b>${['Não é bem isso.','Ainda não fecha.','A delegacia não comprou essa história.','Tem furo nessa teoria.','Volte às pistas, detetive.'][(att-1)%5]}</b> Acusação recusada. Tentativas até agora: ${att}.</div>`:''}
+  <form data-form="${c.id}" style="display:flex;flex-direction:column;gap:14px">
+  ${c.questions.map((q,qi)=>`<fieldset><legend>${qi+1}. ${esc(q.q)}</legend>
+    ${q.options.map(o=>`<label class="opt" for="${c.id}-${q.id}-${o[0]}"><input type="radio" id="${c.id}-${q.id}-${o[0]}" name="${c.id}-${q.id}" value="${o[0]}" data-q="${q.id}" ${ans[q.id]===o[0]?'checked':''}><span>${esc(o[1])}</span></label>`).join('')}
+  </fieldset>`).join('')}
+  <button class="btn" type="submit" ${all?'':'disabled'}>Acusar</button>
+  </form>
+  <div class="box"><h3>Dicas (só se você quiser)</h3>
+    ${used===0?'<p style="font-size:14.5px;color:var(--muted)">Nenhuma dica aparece sozinha. Cada uma que você pedir custa um ponto na patente.</p>':''}
+    ${c.hints.slice(0,used).map((h,i)=>`<div class="hint"><b>Dica ${i+1}</b>${h}</div>`).join('')}
+    <div class="row">${used<c.hints.length?`<button class="btn ghost" type="button" data-hint="1">Pedir dica (${used}/${c.hints.length})</button>`:''}
+    ${att>=3?`<button class="btn ghost" type="button" data-giveup="${S._askGive?'go':'ask'}">${S._askGive?'Confirmar: ver a solução':'Desistir e ver a solução'}</button>`:''}</div>
+  </div>`;
+}
+function viewCase(c){
+  const tabs=[['caso','Caso'],['suspeitos','Suspeitos'],['pistas','Pistas'],['notas','Notas'],['acusar','Acusar']];
+  const body={caso:tabCaso,suspeitos:tabSuspeitos,pistas:tabPistas,notas:tabNotas,acusar:tabAcusar}[S.tab](c);
+  return `
+  <div class="top">
+    <div class="topbar"><button class="back" type="button" data-home="1">← Arquivo</button><h1>${esc(c.title)}</h1><span class="tag">${c.num} ${pips(c.level)}</span></div>
+    <div class="tabs" role="tablist">${tabs.map(t=>`<button class="tab ${t[0]==='acusar'?'accuse':''}" role="tab" type="button" aria-selected="${S.tab===t[0]}" data-tab="${t[0]}">${t[1]}</button>`).join('')}</div>
+  </div>
+  <section class="panel" role="tabpanel">${body}</section>`;
+}
+function render(scrollTop){
+  const c=byId(S.view);
+  if(!c){ S.view='home'; }
+  if(c && !['caso','suspeitos','pistas','notas','acusar'].includes(S.tab)) S.tab='caso';
+  app.innerHTML = c ? viewCase(c) : viewHome();
+  document.title = c ? c.title+' · Agência Lupa' : 'Agência Lupa';
+  if(scrollTop) window.scrollTo(0,0);
+  save();
+}
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+function go(view){
+  S.view=view; S.tab='caso'; S._askReset=false; S._askGive=false;
+  const h = view==='home' ? '' : '#'+view;
+  if(location.hash!==h){ try{ if(h) location.hash=h; else history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  render(true);
+}
+app.addEventListener('click',e=>{
+  const t=e.target.closest('[data-open],[data-home],[data-tab],[data-off],[data-zoom],[data-hint],[data-giveup],[data-reset]');
+  if(!t) return;
+  const c=byId(S.view);
+  if(t.dataset.open){ go(t.dataset.open); return; }
+  if(t.dataset.home){ go('home'); return; }
+  if(t.dataset.tab){ S.tab=t.dataset.tab; S._askGive=false; render(true); return; }
+  if(t.dataset.off && c){ const o=S.off[c.id]||(S.off[c.id]={}); o[t.dataset.off]=!o[t.dataset.off]; render(false); return; }
+  if(t.dataset.zoom && c){ openZoom(c, t.dataset.zoom); return; }
+  if(t.dataset.hint && c){ S.hints[c.id]=Math.min((S.hints[c.id]||0)+1,c.hints.length); render(false); return; }
+  if(t.dataset.giveup && c){
+    if(t.dataset.giveup==='ask'){ S._askGive=true; render(false); return; }
+    S.done[c.id]={attempts:S.attempts[c.id]||0,hints:S.hints[c.id]||0,gaveUp:true}; S._askGive=false; render(true); return;
+  }
+  if(t.dataset.reset){
+    if(t.dataset.reset==='ask'){ S._askReset=true; render(false); return; }
+    S=blank(); render(true); return;
+  }
+});
+app.addEventListener('change',e=>{
+  const r=e.target.closest('input[type=radio][data-q]'); if(!r) return;
+  const c=byId(S.view); if(!c) return;
+  (S.answers[c.id]||(S.answers[c.id]={}))[r.dataset.q]=r.value; save();
+  const f=r.closest('form'); const btn=f&&f.querySelector('button[type=submit]');
+  if(btn) btn.disabled=!c.questions.every(q=>S.answers[c.id][q.id]);
+});
+app.addEventListener('input',e=>{
+  const ta=e.target.closest('textarea[data-notes]'); if(!ta) return;
+  S.notes[ta.dataset.notes]=ta.value; save();
+});
+app.addEventListener('submit',e=>{
+  e.preventDefault();
+  const c=byId(S.view); if(!c) return;
+  const ans=S.answers[c.id]||{};
+  if(!c.questions.every(q=>ans[q.id])) return;
+  S.attempts[c.id]=(S.attempts[c.id]||0)+1;
+  const right=c.questions.filter(q=>ans[q.id]===q.answer).length;
+  if(right===c.questions.length){ S.done[c.id]={attempts:S.attempts[c.id],hints:S.hints[c.id]||0,gaveUp:false}; delete S.last[c.id]; }
+  else S.last[c.id]=right;
+  render(true);
+});
+
+/* ampliação */
+const modal=document.getElementById('modal'), minner=document.getElementById('minner'), mzoom=document.getElementById('mzoom');
+function openZoom(c,id){
+  const k=c.clues.find(x=>x.id===id); if(!k) return;
+  document.getElementById('mtitle').textContent='P-'+(c.clues.indexOf(k)+1)+' · '+k.title;
+  minner.className='inner'; minner.innerHTML=k.art(); mzoom.textContent='Ampliar';
+  document.getElementById('mcap').textContent=k.cap;
+  modal.hidden=false; document.body.style.overflow='hidden'; document.getElementById('mclose').focus();
+}
+function closeZoom(){ modal.hidden=true; minner.innerHTML=''; document.body.style.overflow=''; }
+document.getElementById('mclose').addEventListener('click',closeZoom);
+mzoom.addEventListener('click',()=>{ const on=minner.classList.toggle('x2'); mzoom.textContent=on?'Reduzir':'Ampliar'; });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!modal.hidden) closeZoom(); });
+window.addEventListener('hashchange',()=>{
+  const id=(location.hash||'').slice(1); const v=byId(id)?id:'home';
+  if(v!==S.view){ S.view=v; S.tab='caso'; render(true); }
+});
+
+function start(data){
+  loadLocal();
+  if(data && typeof data==='object' && data.view) S=Object.assign(blank(),data);
+  const id=(location.hash||'').slice(1);
+  if(byId(id)){ if(S.view!==id){ S.view=id; S.tab='caso'; } }
+  else if(!byId(S.view)) S.view='home';
+  if(S.c4v!==2){ ['notes','off','hints','attempts','answers','done','last'].forEach(k=>{ if(S[k]) delete S[k]['caso-4']; }); S.c4v=2; }
+  S._askReset=false; S._askGive=false;
+  render(false);
+}
+try{ window.claude?.hot?.snapshot(()=>JSON.parse(JSON.stringify(S))); }catch(e){}
+if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
